@@ -1,0 +1,14 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'ir.hamed.klox'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ir.hamed.klox'
+        minSdk 24
+        targetSdk 35
+        versionCode 14
+        versionName '5.0.5'
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}

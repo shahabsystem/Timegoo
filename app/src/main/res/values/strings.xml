@@ -1,0 +1,9 @@
+<resources>
+<string name="app_name">تايمگو</string>
+<string name="settings">تنظیمات</string>
+<string name="speak_now">تايمــوبگـــو</string>
+<string name="exit">خروج</string>
+<string name="coffee_url">https://coffeebede.com/shahabsystem</string>
+<string name="remit_url">https://reymit.ir/shahabsystem</string>
+<string name="github_url">https://github.com/shahabsystem</string>
+</resources>

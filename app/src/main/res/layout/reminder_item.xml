@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:id="@+id/reminderTitle" android:text="یادآوری ۱" android:textColor="@color/gold_light" android:textSize="17sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Switch android:id="@+id/reminderEnabled" android:text="فعال" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<EditText android:id="@+id/reminderText" android:hint="...مثلا قرصاتو بخور و يا سماورو آب كن" android:textColor="@color/text" android:textColorHint="@color/muted" android:minLines="2" android:gravity="top" android:inputType="textCapSentences" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/reminderStart" android:text="شروع: ۰۹:۰۰" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="46dp"/>
+<Button android:id="@+id/reminderEnd" android:text="پایان: ۱۸:۰۰" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="46dp"/>
+<TextView android:id="@+id/reminderIntervalLabel" android:text="فاصله یادآوری: ۳۰ دقیقه" android:textColor="@color/text" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<SeekBar android:id="@+id/reminderInterval" android:max="119" android:progress="29" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/pickReminderAudio" android:text="انتخاب صدای این یادآوری" android:background="@drawable/bg_outline_button" android:layout_marginTop="5dp" android:layout_width="match_parent" android:layout_height="46dp"/>
+<Button android:id="@+id/testReminder" android:text="▶ تست" android:background="@drawable/bg_outline_button" android:layout_marginTop="5dp" android:layout_width="match_parent" android:layout_height="46dp"/>
+</LinearLayout>
