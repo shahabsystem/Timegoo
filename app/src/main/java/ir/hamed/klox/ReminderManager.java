@@ -43,7 +43,19 @@ public final class ReminderManager {
         target.set(Calendar.MINUTE, min % 60);
         target.set(Calendar.SECOND, 0);
         target.set(Calendar.MILLISECOND, 0);
-        if (!target.after(now)) target.add(Calendar.DAY_OF_YEAR, 1);
+        int daysMask = p.getInt(prefix + "DaysMask", 127);
+        if (daysMask == 0) daysMask = 127;
+        // Find the next selected weekday at the configured time. Calendar uses Sunday=1..Saturday=7.
+        boolean found = false;
+        for (int d = 0; d < 8; d++) {
+            int dow = target.get(Calendar.DAY_OF_WEEK);
+            if (target.after(now) && (daysMask & (1 << (dow - 1))) != 0) {
+                found = true;
+                break;
+            }
+            target.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        if (!found) return;
 
         Intent intent = new Intent(c, ReminderReceiver.class)
                 .setAction(ACTION_PREFIX + slot)
@@ -105,7 +117,8 @@ public final class ReminderManager {
             SharedPreferences.Editor e = p.edit()
                     .putBoolean("reminder1Enabled", legacyEnabled)
                     .putString("reminder1Text", legacyText)
-                    .putInt("reminder1Minute", p.getInt("reminderMinute", 9 * 60));
+                    .putInt("reminder1Minute", p.getInt("reminderMinute", 9 * 60))
+                    .putInt("reminder1DaysMask", p.getInt("reminderDaysMask", 127));
             String audio = p.getString("reminderAudioUri", "");
             if (!audio.isEmpty()) e.putString("reminder1AudioUri", audio);
             e.apply();
