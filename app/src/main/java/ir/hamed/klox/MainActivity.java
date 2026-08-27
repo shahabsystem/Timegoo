@@ -29,11 +29,15 @@ public static void updatePersistentNotification(Context ctx){
  String mode=p.getString("dateMode","jalali"); Calendar now=Calendar.getInstance(); String time=new SimpleDateFormat("HH:mm",Locale.US).format(now.getTime());
  String date;
  if("gregorian".equals(mode)) date=new SimpleDateFormat("yyyy/MM/dd",Locale.US).format(now.getTime()); else {int[] j=jalali(now.get(Calendar.YEAR),now.get(Calendar.MONTH)+1,now.get(Calendar.DAY_OF_MONTH));date=String.format(Locale.US,"%04d/%02d/%02d",j[0],j[1],j[2]);}
+ String notificationText=toPersianStatic(time)+" • "+toPersianStatic(date);
+ android.widget.RemoteViews rv=new android.widget.RemoteViews(ctx.getPackageName(),R.layout.notification_large);
+ rv.setTextViewText(R.id.notificationTitle,"تايمگو");
+ rv.setTextViewText(R.id.notificationText,notificationText);
  Notification n;
  if(Build.VERSION.SDK_INT>=26){
-  n=new Notification.Builder(ctx,ch).setSmallIcon(R.mipmap.ic_launcher).setContentTitle("تايمگو").setContentText(toPersianStatic(time)+" • "+toPersianStatic(date)).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx,ch).setSmallIcon(R.mipmap.ic_launcher_modern).setCustomContentView(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }else{
-  n=new Notification.Builder(ctx).setSmallIcon(R.mipmap.ic_launcher).setContentTitle("تايمگو").setContentText(toPersianStatic(time)+" • "+toPersianStatic(date)).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx).setSmallIcon(R.mipmap.ic_launcher_modern).setContentView(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }
  nm.notify(1701,n);
 }

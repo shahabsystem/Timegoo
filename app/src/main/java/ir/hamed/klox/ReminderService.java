@@ -47,10 +47,14 @@ public class ReminderService extends Service {
         String text = p.getString(prefix + "Text", "یادآوری");
         String audio = p.getString(prefix + "AudioUri", "");
 
+        android.widget.RemoteViews rv = new android.widget.RemoteViews(getPackageName(), R.layout.notification_large);
+        rv.setTextViewText(R.id.notificationTitle, "یادآوری " + slot);
+        rv.setTextViewText(R.id.notificationText, text);
         Notification n;
         if (Build.VERSION.SDK_INT >= 26) {
             n = new Notification.Builder(this, CH)
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.mipmap.ic_launcher_modern)
+                    .setCustomContentView(rv)
                     .setContentTitle("یادآوری " + slot)
                     .setContentText(text)
                     .setAutoCancel(true)
@@ -58,7 +62,8 @@ public class ReminderService extends Service {
                     .build();
         } else {
             n = new Notification.Builder(this)
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(R.mipmap.ic_launcher_modern)
+                    .setContentView(rv)
                     .setContentTitle("یادآوری " + slot)
                     .setContentText(text)
                     .setAutoCancel(true)

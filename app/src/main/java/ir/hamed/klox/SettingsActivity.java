@@ -11,6 +11,7 @@ import android.view.*;
 import android.widget.*;
 
 import java.util.Locale;
+import java.util.Calendar;
 
 public class SettingsActivity extends Activity {
     private SharedPreferences prefs;
@@ -83,6 +84,7 @@ public class SettingsActivity extends Activity {
             Button start = v.findViewById(R.id.start), end = v.findViewById(R.id.end);
             SeekBar bar = v.findViewById(R.id.interval);
             TextView label = v.findViewById(R.id.intervalLabel);
+            LinearLayout days = v.findViewById(R.id.slotDays);
             title.setText("بازه " + (s + 1));
             boolean def = s == 0;
             en.setChecked(prefs.getBoolean("slot" + s + "Enabled", def));
@@ -95,6 +97,7 @@ public class SettingsActivity extends Activity {
             end.setText("پایان: " + fmt(ed));
             bar.setProgress(Math.max(0, Math.min(119, inter - 1)));
             label.setText("فاصله اعلام: " + fmtNumber(inter) + " دقیقه");
+            buildDayChecks(days, "slot" + s + "DaysMask", "روزهای اعلام", true);
             en.setOnCheckedChangeListener((x, on) -> {
                 prefs.edit().putBoolean("slot" + idx + "Enabled", on).apply();
                 ScheduleManager.scheduleNext(this);
@@ -206,6 +209,7 @@ public class SettingsActivity extends Activity {
             Button test = v.findViewById(R.id.testReminder);
             TextView end = v.findViewById(R.id.reminderEnd);
             TextView intervalLabel = v.findViewById(R.id.reminderIntervalLabel);
+            LinearLayout days = v.findViewById(R.id.reminderDays);
             SeekBar interval = v.findViewById(R.id.reminderInterval);
             end.setVisibility(View.GONE);
             intervalLabel.setVisibility(View.GONE);
@@ -260,6 +264,48 @@ public class SettingsActivity extends Activity {
             prefs.edit().putString("reminder" + slot + "AudioUri", u.toString()).apply();
             Toast.makeText(this, "صدای یادآوری " + fmtNumber(slot) + " انتخاب شد", Toast.LENGTH_SHORT).show();
             ReminderManager.schedule(this);
+        }
+    }
+
+    private void buildDayChecks(LinearLayout container, String prefKey, String labelText, boolean schedule) {
+        if (container == null) return;
+        container.removeAllViews();
+        TextView label = new TextView(this);
+        label.setText(labelText + ":");
+        label.setTextColor(getResources().getColor(R.color.muted));
+        label.setTextSize(13);
+        container.addView(label);
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setWeightSum(7f);
+        container.addView(row);
+
+        // Persian order: شنبه، یکشنبه، دوشنبه، سه‌شنبه، چهارشنبه، پنجشنبه، جمعه.
+        final String[] names = {"ش", "ی", "د", "س", "چ", "پ", "ج"};
+        final int[] calendarDays = {Calendar.SATURDAY, Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY};
+        int mask = prefs.getInt(prefKey, 127);
+        for (int i = 0; i < 7; i++) {
+            CheckBox cb = new CheckBox(this);
+            cb.setText(names[i]);
+            cb.setTextColor(getResources().getColor(R.color.text));
+            cb.setGravity(Gravity.CENTER);
+            cb.setTextSize(13);
+            cb.setChecked((mask & (1 << (calendarDays[i] - 1))) != 0);
+            final int bit = 1 << (calendarDays[i] - 1);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, 46, 1f);
+            row.addView(cb, lp);
+            cb.setOnCheckedChangeListener((button, checked) -> {
+                int m = prefs.getInt(prefKey, 127);
+                if (checked) m |= bit; else m &= ~bit;
+                if (m == 0) {
+                    button.setChecked(true);
+                    Toast.makeText(this, "حداقل یک روز باید انتخاب شود", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                prefs.edit().putInt(prefKey, m).apply();
+                if (schedule) ScheduleManager.scheduleNext(this); else ReminderManager.schedule(this);
+            });
         }
     }
 

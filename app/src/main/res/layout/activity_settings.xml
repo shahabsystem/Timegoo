@@ -27,7 +27,7 @@
 </RadioGroup>
 
 <TextView android:text="زمان‌بندی اعلام ساعت" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:text="تا ۷ بازه مستقل؛ برای هر بازه شروع، پایان و فاصله اعلام را جداگانه تعیین کن." android:textColor="@color/muted" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="تا ۷ بازه مستقل؛ برای هر بازه شروع، پایان، فاصله اعلام و روزهای هفته را جداگانه تعیین کن." android:textColor="@color/muted" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <LinearLayout android:id="@+id/slotContainer" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
 <LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -53,7 +53,7 @@
 </LinearLayout>
 
 <TextView android:text="۵ یادآوری روزانه" android:textColor="@color/gold_light" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:text="برای هرکدام زمان، متن، فعال/غیرفعال و صدای جداگانه تعیین کن. یادآوری‌ها هر روز در همان ساعت تکرار می‌شوند." android:textColor="@color/muted" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="برای هرکدام زمان، متن، روزهای هفته، فعال/غیرفعال و صدای جداگانه تعیین کن؛ مثلاً جمعه را خاموش کن تا آن روز یادآوری اجرا نشود." android:textColor="@color/muted" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <LinearLayout android:id="@+id/reminderContainer" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
 <LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
