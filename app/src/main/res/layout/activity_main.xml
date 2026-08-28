@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:fillViewport="true" android:background="@color/bg" android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout android:id="@+id/root" android:orientation="vertical" android:padding="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+<ImageView android:id="@+id/icon" android:src="@mipmap/ic_launcher_modern" android:contentDescription="ساعت" android:layout_width="64dp" android:layout_height="64dp"/>
+<LinearLayout android:orientation="vertical" android:layout_marginStart="14dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+<TextView android:text="سخنگوی ساعت" android:textColor="@color/text" android:textSize="25sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="اعلام خودکار ساعت با صدای فارسی" android:textColor="@color/muted" android:textSize="14sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout>
+</LinearLayout>
+
+<LinearLayout android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_time" android:layout_marginTop="18dp" android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="ساعت فعلی" android:textColor="@color/gold_light" android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/clock" android:text="۱۴:۳۰" android:textColor="@color/gold_light" android:textSize="58sp" android:textStyle="bold" android:gravity="center" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/date" android:text="۱۴۰۴/۰۵/۲۶" android:textColor="@color/muted" android:textSize="17sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout>
+
+<LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:background="@drawable/bg_card" android:layout_marginTop="14dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<View android:id="@+id/statusDot" android:background="@color/green" android:layout_width="12dp" android:layout_height="12dp"/>
+<LinearLayout android:orientation="vertical" android:layout_marginStart="12dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
+<TextView android:text="وضعیت برنامه" android:textColor="@color/text" android:textSize="16sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/statusText" android:text="فعال" android:textColor="@color/green" android:textSize="14sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout>
+</LinearLayout>
+
+<Button android:id="@+id/speak" android:text="اعلام ساعت الآن" android:textColor="#15110A" android:textStyle="bold" android:textSize="16sp" android:background="@drawable/bg_button" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="54dp"/>
+<LinearLayout android:orientation="horizontal" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="54dp">
+<Button android:id="@+id/settings" android:text="تنظیمات" android:textColor="@color/text" android:textSize="16sp" android:background="@drawable/bg_outline_button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"/>
+<Button android:id="@+id/exit" android:text="خروج" android:textColor="#FF9B9B" android:textSize="16sp" android:background="@drawable/bg_outline_button" android:layout_marginStart="10dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"/>
+</LinearLayout>
+<TextView android:text="از پيشنهادات براي توسعه استقبال مي شود" android:textColor="@color/muted" android:textSize="12sp" android:gravity="center" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout></ScrollView>

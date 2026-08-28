@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/bg" android:fillViewport="true" android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout android:id="@+id/root" android:orientation="vertical" android:padding="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="تنظیمات" android:textColor="@color/text" android:textSize="28sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="کنترل زمان‌بندی، صدا، تاریخ، یادآوری، تکان دادن گوشی و ظاهر برنامه" android:textColor="@color/muted" android:textSize="14sp" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+<LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="عمومی" android:textColor="@color/gold_light" android:textSize="18sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Switch android:id="@+id/master" android:text="فعال بودن برنامه" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Switch android:id="@+id/shakeToSpeak" android:text="اعلام ساعت با تکان دادن گوشی" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="برای جلوگیری از اعلام ناخواسته، تکان نسبتاً شدید و با فاصله زمانی کوتاه تشخیص داده می‌شود. این قابلیت حتی وقتی از برنامه خارج می‌شوی هم فعال می‌ماند؛ برای بهترین عملکرد، محدودیت باتری را از بخش زیر حذف کن." android:textColor="@color/muted" android:textSize="12sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Switch android:id="@+id/persistentNotification" android:text="نمایش دائمی ساعت و تاریخ در نوتیفیکیشن" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="تاریخ نوتیفیکیشن مطابق انتخاب شمسی یا میلادی نمایش داده می‌شود." android:textColor="@color/muted" android:textSize="12sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout>
+
+<LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="اجرای مطمئن در پس‌زمینه" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="برای اینکه اعلام ساعت و قابلیت تکان دادن گوشی توسط مدیریت باتری اندروید متوقف نشود، می‌توانی محدودیت بهینه‌سازی باتری این برنامه را حذف کنی." android:textColor="@color/muted" android:textSize="12sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/batteryStatus" android:textColor="@color/text" android:textSize="13sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/batterySettings" android:text="⚡ باز کردن تنظیمات باتری برنامه" android:background="@drawable/bg_button" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="50dp"/>
+</LinearLayout>
+
+<TextView android:text="نوع تاریخ" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioGroup android:id="@+id/dateMode" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+<RadioButton android:id="@+id/dateJalali" android:text="شمسی" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/dateGregorian" android:text="میلادی" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+</RadioGroup>
+
+<TextView android:text="زمان‌بندی اعلام ساعت" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="تا ۷ بازه مستقل؛ برای هر بازه شروع، پایان، فاصله اعلام و روزهای هفته را جداگانه تعیین کن." android:textColor="@color/muted" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<LinearLayout android:id="@+id/slotContainer" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+<LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="صدای پیش از اعلام" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioGroup android:id="@+id/dingChoices" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+<RadioButton android:id="@+id/ding1" android:text="Ding ۱" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/ding2" android:text="Ding ۲" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/ding3" android:text="Ding ۳" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/ding4" android:text="Ding ۴" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/ding5" android:text="Ding ۵" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</RadioGroup>
+<Button android:id="@+id/testDing" android:text="▶ تست Ding انتخاب‌شده" android:background="@drawable/bg_button" android:layout_width="match_parent" android:layout_height="50dp"/>
+<Switch android:id="@+id/dingOnlyMode" android:text="🔔 فقط Ding؛ بدون اعلام ساعت" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/customDingStatus" android:text="Ding سفارشی: استفاده نمی‌شود" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/pickCustomDing" android:text="🎵 انتخاب Ding از گوشی" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="50dp"/>
+</LinearLayout>
+
+<LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="صدا" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="شدت صدا هنگام اعلام" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/volumeLabel" android:text="۸۰٪" android:textColor="@color/gold_light" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<SeekBar android:id="@+id/volume" android:max="80" android:progress="60" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="سرعت پخش" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/speedLabel" android:text="۱۰۰٪" android:textColor="@color/gold_light" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<SeekBar android:id="@+id/speed" android:max="60" android:progress="30" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+</LinearLayout>
+
+<TextView android:text="۵ یادآوری روزانه" android:textColor="@color/gold_light" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="20dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="برای هرکدام زمان، متن، روزهای هفته، فعال/غیرفعال و صدای جداگانه تعیین کن؛ مثلاً جمعه را خاموش کن تا آن روز یادآوری اجرا نشود." android:textColor="@color/muted" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<LinearLayout android:id="@+id/reminderContainer" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+<LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="پوسته و ظاهر" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="اندازه فونت ساعت" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<SeekBar android:id="@+id/fontSize" android:max="36" android:progress="24" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/fontPreview" android:text="نمونه ساعت: ۱۲:۳۴" android:textColor="@color/gold_light" android:textSize="28sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="رنگ تأکیدی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioGroup android:id="@+id/colors" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+<RadioButton android:id="@+id/blue" android:text="آبی" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/green" android:text="سبز" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/purple" android:text="بنفش" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/orange" android:text="طلایی" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+</RadioGroup>
+</LinearLayout>
+
+<LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<TextView android:text="اطلاعات سازنده" android:textColor="@color/gold_light" android:textSize="19sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/creatorName" android:text="سازنده: Hamed Mohammadinikche" android:textColor="@color/text" android:textSize="15sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/creatorEmail" android:text="ایمیل: hamedmohammadinikche@gmail.com" android:textColor="@color/gold_light" android:textSize="15sp" android:paddingTop="8dp" android:paddingBottom="8dp" android:clickable="true" android:focusable="true" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/creatorGithub" android:text="پروژه‌های دیگر: github.com/shahabsystem" android:textColor="@color/gold_light" android:textSize="15sp" android:paddingTop="8dp" android:paddingBottom="8dp" android:clickable="true" android:focusable="true" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/coffee" android:text="☕ یه قهوه مهمونم کن" android:background="@drawable/bg_button" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="50dp"/>
+<Button android:id="@+id/remit" android:text="💚 یا نقدی خوشحالم کن" android:background="@drawable/bg_outline_button" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="50dp"/>
+</LinearLayout>
+
+<Button android:id="@+id/back" android:text="بازگشت" android:background="@drawable/bg_outline_button" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="52dp"/>
+</LinearLayout></ScrollView>
