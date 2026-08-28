@@ -1,4 +1,4 @@
-name: SayClock Android APK
+name: Timegoo Android APK
 
 on:
   push:
@@ -78,14 +78,6 @@ jobs:
           set -euo pipefail
           cd "$PROJECT_DIR"
           gradle --no-daemon --stacktrace clean assembleDebug
-
-      - name: Build release APK
-        shell: bash
-        run: |
-          set -euo pipefail
-          cd "$PROJECT_DIR"
-          gradle --no-daemon --stacktrace assembleRelease
-
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
