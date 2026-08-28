@@ -1,6 +1,6 @@
 package ir.hamed.klox;
 import android.app.*;import android.content.*;import android.graphics.Typeface;import android.net.Uri;import android.os.*;import android.provider.Settings;import android.view.*;import android.widget.*;import java.util.*;
-public class SettingsActivity extends Activity{private SharedPreferences prefs;private LinearLayout root,slotContainer;private SeekBar fontSize;private TextView preview;private static final int SLOTS=7; private static final int PICK_REMINDER_AUDIO=7001;
+public class SettingsActivity extends Activity{private SharedPreferences prefs;private LinearLayout root,slotContainer;private SeekBar fontSize;private TextView preview;private static final int SLOTS=7; private static final int PICK_REMINDER_AUDIO=7001; private static final int PICK_CUSTOM_DING=7002;
 @Override public void onCreate(Bundle b){super.onCreate(b);setContentView(R.layout.activity_settings);prefs=getSharedPreferences("settings",MODE_PRIVATE);root=findViewById(R.id.root);slotContainer=findViewById(R.id.slotContainer);Switch master=findViewById(R.id.master);master.setChecked(prefs.getBoolean("enabled",true));master.setOnCheckedChangeListener((v,on)->{prefs.edit().putBoolean("enabled",on).apply();if(on)ScheduleManager.scheduleNext(this);else ScheduleManager.cancel(this);});buildSlots();buildDingSelection();buildVolume();buildSpeed();buildDateMode();buildPersistentNotification();buildReminder();buildAppearance();findViewById(R.id.back).setOnClickListener(v->finish());if(Build.VERSION.SDK_INT>=31){try{AlarmManager am=(AlarmManager)getSystemService(ALARM_SERVICE);if(am!=null&&!am.canScheduleExactAlarms())startActivity(new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM));}catch(Exception ignored){}}}
 private void buildSlots(){LayoutInflater inf=LayoutInflater.from(this);for(int s=0;s<SLOTS;s++){View v=inf.inflate(R.layout.slot_item,slotContainer,false);slotContainer.addView(v);final int idx=s;TextView title=v.findViewById(R.id.slotTitle);Switch en=v.findViewById(R.id.enabled);Button start=v.findViewById(R.id.start),end=v.findViewById(R.id.end);SeekBar bar=v.findViewById(R.id.interval);TextView label=v.findViewById(R.id.intervalLabel);title.setText("بازه "+(s+1));boolean def=s==0;en.setChecked(prefs.getBoolean("slot"+s+"Enabled",def));int defStart=s==0?420:s==1?840:s==2?1200:0;int defEnd=s==0?600:s==1?1200:s==2?1440:s==3?360:60;int st=prefs.getInt("slot"+s+"Start",defStart),ed=prefs.getInt("slot"+s+"End",defEnd),inter=prefs.getInt("slot"+s+"Interval",30);start.setText("شروع: "+fmt(st));end.setText("پایان: "+fmt(ed));bar.setProgress(Math.max(0,Math.min(119,inter-1)));label.setText("فاصله اعلام: "+inter+" دقیقه");en.setOnCheckedChangeListener((x,on)->{prefs.edit().putBoolean("slot"+idx+"Enabled",on).apply();ScheduleManager.scheduleNext(this);});start.setOnClickListener(x->pickTime(idx,true,start));end.setOnClickListener(x->pickTime(idx,false,end));bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar b,int p,boolean f){int m=p+1;label.setText("فاصله اعلام: "+m+" دقیقه");if(f)prefs.edit().putInt("slot"+idx+"Interval",m).apply();}public void onStartTrackingTouch(SeekBar b){}public void onStopTrackingTouch(SeekBar b){prefs.edit().putInt("slot"+idx+"Interval",b.getProgress()+1).apply();ScheduleManager.scheduleNext(SettingsActivity.this);}});}}
 private void pickTime(int idx,boolean startFlag,Button button){int old=prefs.getInt("slot"+idx+(startFlag?"Start":"End"),startFlag?420:600);int h=(old/60)%24,m=old%60;new TimePickerDialog(this,(view,hh,mm)->{int val=hh*60+mm;prefs.edit().putInt("slot"+idx+(startFlag?"Start":"End"),val).apply();button.setText((startFlag?"شروع: ":"پایان: ")+fmt(val));ScheduleManager.scheduleNext(this);},h,m,true).show();}
@@ -12,8 +12,17 @@ int[] ids={R.id.ding1,R.id.ding2,R.id.ding3,R.id.ding4,R.id.ding5};
 if(saved<1||saved>5)saved=1;
 group.check(ids[saved-1]);
 group.setOnCheckedChangeListener((g,id)->{
-for(int i=0;i<ids.length;i++){if(id==ids[i]){prefs.edit().putInt("dingNumber",i+1).apply();break;}}
+for(int i=0;i<ids.length;i++){if(id==ids[i]){prefs.edit().putInt("dingNumber",i+1).remove("customDingUri").apply(); updateCustomDingStatus(); break;}}
 });
+Switch dingOnly=findViewById(R.id.dingOnlyMode);
+dingOnly.setChecked(prefs.getBoolean("dingOnlyMode",false));
+dingOnly.setOnCheckedChangeListener((v,on)->prefs.edit().putBoolean("dingOnlyMode",on).apply());
+findViewById(R.id.pickCustomDing).setOnClickListener(v->{
+ Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT); i.addCategory(Intent.CATEGORY_OPENABLE); i.setType("audio/*");
+ i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+ startActivityForResult(i,PICK_CUSTOM_DING);
+});
+updateCustomDingStatus();
 findViewById(R.id.testDing).setOnClickListener(v->{ if(speakerForTest==null) speakerForTest=new AudioTimeSpeaker(this); speakerForTest.testSelectedDing(); });
 }
 private AudioTimeSpeaker speakerForTest;
@@ -65,7 +74,16 @@ private void buildReminder(){
 }
 @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
  super.onActivityResult(requestCode,resultCode,data);
- if(requestCode==PICK_REMINDER_AUDIO && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+ if(requestCode==PICK_CUSTOM_DING && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+ Uri u=data.getData();
+ try{getContentResolver().takePersistableUriPermission(u,Intent.FLAG_GRANT_READ_URI_PERMISSION);}catch(Exception ignored){}
+ prefs.edit().putString("customDingUri",u.toString()).apply();
+ RadioGroup g=findViewById(R.id.dingChoices); if(g!=null)g.clearCheck();
+ updateCustomDingStatus();
+ Toast.makeText(this,"Ding سفارشی انتخاب شد",Toast.LENGTH_SHORT).show();
+ return;
+}
+if(requestCode==PICK_REMINDER_AUDIO && resultCode==RESULT_OK && data!=null && data.getData()!=null){
    Uri u=data.getData();
    try{getContentResolver().takePersistableUriPermission(u,Intent.FLAG_GRANT_READ_URI_PERMISSION);}catch(Exception ignored){}
    prefs.edit().putString("reminderAudioUri",u.toString()).apply();
@@ -73,6 +91,11 @@ private void buildReminder(){
  }
 }
 
+private void updateCustomDingStatus(){
+ TextView status=findViewById(R.id.customDingStatus); if(status==null)return;
+ String u=prefs.getString("customDingUri","");
+ status.setText(u.isEmpty()?"Ding انتخابی: یکی از صداهای داخلی":"Ding انتخابی: فایل صوتی گوشی ✓");
+}
 private void buildVolume(){SeekBar v=findViewById(R.id.volume);TextView l=findViewById(R.id.volumeLabel);int saved=prefs.getInt("announcementVolume",80);v.setProgress(Math.max(0,Math.min(80,saved-20)));l.setText(toFa(saved)+"٪");v.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int p,boolean f){int val=p+20;l.setText(toFa(val)+"٪");if(f)prefs.edit().putInt("announcementVolume",val).apply();}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){prefs.edit().putInt("announcementVolume",s.getProgress()+20).apply();}});}
 private void buildSpeed(){
 SeekBar v=findViewById(R.id.speed); TextView l=findViewById(R.id.speedLabel);
