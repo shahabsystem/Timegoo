@@ -135,11 +135,24 @@ public class SettingsActivity extends Activity {
         RadioGroup group = findViewById(R.id.dingChoices);
         int saved = prefs.getInt("dingNumber", 1);
         int[] ids = {R.id.ding1, R.id.ding2, R.id.ding3, R.id.ding4, R.id.ding5};
-        if (saved < 1 || saved > 5) saved = 1;
-        group.check(ids[saved - 1]);
+        String customUri = prefs.getString("customDingUri", "");
+        if (!customUri.isEmpty()) {
+            group.check(R.id.dingCustom);
+        } else {
+            if (saved < 1 || saved > 5) saved = 1;
+            group.check(ids[saved - 1]);
+        }
         group.setOnCheckedChangeListener((g, id) -> {
             for (int i = 0; i < ids.length; i++) {
-                if (id == ids[i]) { prefs.edit().putInt("dingNumber", i + 1).apply(); break; }
+                if (id == ids[i]) {
+                    prefs.edit().putInt("dingNumber", i + 1).remove("customDingUri").apply();
+                    TextView st = findViewById(R.id.customDingStatus);
+                    if (st != null) st.setText("Ding سفارشی: استفاده نمی‌شود");
+                    break;
+                }
+            }
+            if (id == R.id.dingCustom && prefs.getString("customDingUri", "").isEmpty()) {
+                pickCustomDingFile();
             }
         });
         Switch dingOnly = findViewById(R.id.dingOnlyMode);
@@ -151,17 +164,21 @@ public class SettingsActivity extends Activity {
         String customUri = prefs.getString("customDingUri", "");
         customDingStatus.setText(customUri.isEmpty() ? "Ding سفارشی: استفاده نمی‌شود" : "Ding سفارشی: انتخاب شده ✓");
         customDing.setOnClickListener(v -> {
-            Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            i.addCategory(Intent.CATEGORY_OPENABLE);
-            i.setType("audio/*");
-            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-            startActivityForResult(i, PICK_CUSTOM_DING);
+            pickCustomDingFile();
         });
 
         findViewById(R.id.testDing).setOnClickListener(v -> {
             if (speakerForTest == null) speakerForTest = new AudioTimeSpeaker(this);
             speakerForTest.testSelectedDing();
         });
+    }
+
+    private void pickCustomDingFile() {
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("audio/*");
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        startActivityForResult(i, PICK_CUSTOM_DING);
     }
 
     private void buildDateMode() {
@@ -228,6 +245,7 @@ public class SettingsActivity extends Activity {
             TextView intervalLabel = v.findViewById(R.id.reminderIntervalLabel);
             LinearLayout days = v.findViewById(R.id.reminderDays);
             SeekBar interval = v.findViewById(R.id.reminderInterval);
+            buildDayChecks(days, key + "DaysMask", "روزهای یادآوری", false);
             end.setVisibility(View.GONE);
             intervalLabel.setVisibility(View.GONE);
             interval.setVisibility(View.GONE);
@@ -277,9 +295,11 @@ public class SettingsActivity extends Activity {
             Uri u = data.getData();
             try { getContentResolver().takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION); } catch (Exception ignored) {}
             prefs.edit().putString("customDingUri", u.toString()).apply();
+            RadioGroup g = findViewById(R.id.dingChoices);
+            if (g != null) g.check(R.id.dingCustom);
             TextView status = findViewById(R.id.customDingStatus);
             if (status != null) status.setText("Ding سفارشی: انتخاب شده ✓");
-            Toast.makeText(this, "Ding سفارشی انتخاب شد", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ding سفارشی اضافه و فعال شد", Toast.LENGTH_SHORT).show();
             return;
         }
         if (requestCode > PICK_REMINDER_AUDIO_BASE && requestCode <= PICK_REMINDER_AUDIO_BASE + REMINDERS

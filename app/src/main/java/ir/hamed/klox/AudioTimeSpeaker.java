@@ -128,11 +128,9 @@ public final class AudioTimeSpeaker {
     }
 
     private void addSelectedDing(List<Integer> ids, android.content.SharedPreferences p) {
-        String custom = p.getString("customDingUri", "");
-        // Custom Ding is handled separately by playCustomDing(); resource list
-        // cannot directly contain a content URI.
+        String custom = p.getString("customDingUri", "").trim();
         if (!custom.isEmpty()) {
-            // Marker -1 means the custom URI should be played.
+            // -1 is a private marker for a persisted content:// audio URI.
             ids.add(-1);
             return;
         }
@@ -159,8 +157,17 @@ public final class AudioTimeSpeaker {
         try {
             final MediaPlayer next;
             if (sequence.get(index) == -1) {
-                String custom = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("customDingUri", "");
+                String custom = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("customDingUri", "").trim();
                 next = custom.isEmpty() ? null : MediaPlayer.create(context, android.net.Uri.parse(custom));
+                if (next == null) {
+                    // The selected file may have been deleted or its permission revoked.
+                    // Fall back to the currently selected built-in Ding instead of failing silently.
+                    List<Integer> fallback = new ArrayList<>();
+                    int dingNumber = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("dingNumber", 1);
+                    if (dingNumber < 1 || dingNumber > 5) dingNumber = 1;
+                    addIfExists(fallback, raw("ding" + dingNumber));
+                    if (!fallback.isEmpty()) { playAt(fallback, 0); return; }
+                }
             } else {
                 next = MediaPlayer.create(context, sequence.get(index));
             }
@@ -197,6 +204,13 @@ public final class AudioTimeSpeaker {
             }
             next.start();
         } catch (Exception ignored) {
+            if (index < sequence.size() && sequence.get(index) == -1) {
+                List<Integer> fallback = new ArrayList<>();
+                int dingNumber = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getInt("dingNumber", 1);
+                if (dingNumber < 1 || dingNumber > 5) dingNumber = 1;
+                addIfExists(fallback, raw("ding" + dingNumber));
+                if (!fallback.isEmpty()) { playAt(fallback, 0); return; }
+            }
             playAt(sequence, index + 1);
         }
     }
