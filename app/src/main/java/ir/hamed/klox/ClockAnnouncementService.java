@@ -13,7 +13,7 @@ public class ClockAnnouncementService extends Service {
         android.widget.RemoteViews rv = new android.widget.RemoteViews(getPackageName(), R.layout.notification_large);
         rv.setTextViewText(R.id.notificationTitle, "سخنگوی ساعت");
         rv.setTextViewText(R.id.notificationText, "در حال اعلام ساعت…");
-        b.setContentTitle("سخنگوی ساعت").setContentText("در حال اعلام ساعت…").setCustomContentView(rv).setContent(rv).setSmallIcon(R.mipmap.ic_launcher_modern).setOngoing(true).setOnlyAlertOnce(true);
+        b.setContentTitle("سخنگوی ساعت").setContentText("در حال اعلام ساعت…").setCustomContentView(rv).setContent(rv).setSmallIcon(R.drawable.ic_status_clock).setOngoing(true).setOnlyAlertOnce(true);
         startForeground(1201, b.build());
     }
     @Override public int onStartCommand(Intent intent,int flags,int startId){

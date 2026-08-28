@@ -53,7 +53,7 @@ public class ReminderService extends Service {
         Notification n;
         if (Build.VERSION.SDK_INT >= 26) {
             n = new Notification.Builder(this, CH)
-                    .setSmallIcon(R.mipmap.ic_launcher_modern)
+                    .setSmallIcon(R.drawable.ic_status_clock)
                     .setCustomContentView(rv)
                     .setContentTitle("یادآوری " + slot)
                     .setContentText(text)
@@ -62,7 +62,7 @@ public class ReminderService extends Service {
                     .build();
         } else {
             n = new Notification.Builder(this)
-                    .setSmallIcon(R.mipmap.ic_launcher_modern)
+                    .setSmallIcon(R.drawable.ic_status_clock)
                     .setContent(rv)
                     .setContentTitle("یادآوری " + slot)
                     .setContentText(text)

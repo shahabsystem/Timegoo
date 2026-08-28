@@ -35,9 +35,9 @@ public static void updatePersistentNotification(Context ctx){
  rv.setTextViewText(R.id.notificationText,notificationText);
  Notification n;
  if(Build.VERSION.SDK_INT>=26){
-  n=new Notification.Builder(ctx,ch).setSmallIcon(R.mipmap.ic_launcher_modern).setCustomContentView(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx,ch).setSmallIcon(R.drawable.ic_status_clock).setCustomContentView(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }else{
-  n=new Notification.Builder(ctx).setSmallIcon(R.mipmap.ic_launcher_modern).setContent(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx).setSmallIcon(R.drawable.ic_status_clock).setContent(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }
  nm.notify(1701,n);
 }

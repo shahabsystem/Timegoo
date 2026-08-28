@@ -21,3 +21,8 @@
 - یکپارچه‌سازی GitHub Actions برای ساخت Debug و Release APK.
 - نصب خودکار Android SDK 35 در CI برای کاهش خطاهای Build.
 - افزایش versionCode به 11 و versionName به 5.0.0.
+
+
+## 5.0.8
+- Added a dedicated monochrome clock icon for Android status-bar notifications.
+- Launcher icon remains unchanged.
