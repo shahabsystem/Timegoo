@@ -41,17 +41,6 @@ public final class AudioTimeSpeaker {
         speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
     }
 
-    /** Used by scheduled announcements. Ding-only affects these automatic announcements. */
-    public void speakScheduledTime() {
-        Calendar now = Calendar.getInstance(Locale.US);
-        android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        if (p.getBoolean("dingOnlyMode", false)) {
-            playSelectedDing();
-            return;
-        }
-        speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
-    }
-
     public void speak(int hour, int minute) {
         stop();
         List<Integer> sequence = buildSequence(hour, minute);
@@ -65,7 +54,9 @@ public final class AudioTimeSpeaker {
         List<Integer> ids = new ArrayList<>();
         android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
 
-        addSelectedDing(ids, p);
+        int dingNumber = p.getInt("dingNumber", 1);
+        if (dingNumber < 1 || dingNumber > 10) dingNumber = 1;
+        addIfExists(ids, raw("ding" + dingNumber));
 
         // Round the COMPLETE time to the nearest five minutes.
         // 01/02 -> :00, 03/04 -> :05, ... 58/59 -> next hour :00.
@@ -112,54 +103,16 @@ public final class AudioTimeSpeaker {
     }
 
     public void testSelectedDing() {
-        playSelectedDing();
-    }
-
-    private void playSelectedDing() {
         stop();
         android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        if ("custom".equals(p.getString("dingMode", "builtin"))) {
-            String uri = p.getString("customDingUri", "");
-            if (!uri.isEmpty()) {
-                requestFocus();
-                boostVolume();
-                playUri(uri);
-                return;
-            }
-        }
+        int n = p.getInt("dingNumber", 1);
+        if (n < 1 || n > 10) n = 1;
         List<Integer> one = new ArrayList<>();
-        addSelectedDing(one, p);
+        addIfExists(one, raw("ding" + n));
         if (one.isEmpty()) return;
         requestFocus();
         boostVolume();
         playAt(one, 0);
-    }
-
-    private void addSelectedDing(List<Integer> ids, android.content.SharedPreferences p) {
-        if ("custom".equals(p.getString("dingMode", "builtin"))) {
-            String uri = p.getString("customDingUri", "");
-            if (!uri.isEmpty()) { ids.add(-1); return; }
-        }
-        int dingNumber = p.getInt("dingNumber", 1);
-        if (dingNumber < 1 || dingNumber > 5) dingNumber = 1;
-        addIfExists(ids, raw("ding" + dingNumber));
-    }
-
-    private void playUri(String uri) {
-        try {
-            final MediaPlayer next = MediaPlayer.create(context, android.net.Uri.parse(uri));
-            player = next;
-            if (next == null) { restoreVolume(); releaseFocus(); return; }
-            if (Build.VERSION.SDK_INT >= 21) {
-                next.setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build());
-            }
-            next.setOnCompletionListener(mp -> { try { mp.release(); } catch (Exception ignored) {} player=null; restoreVolume(); releaseFocus(); });
-            next.setOnErrorListener((mp, what, extra) -> { try { mp.release(); } catch (Exception ignored) {} player=null; restoreVolume(); releaseFocus(); return true; });
-            next.start();
-        } catch (Exception ignored) { restoreVolume(); releaseFocus(); }
     }
 
     private void addIfExists(List<Integer> ids, int id) {
@@ -178,13 +131,7 @@ public final class AudioTimeSpeaker {
         }
         releasePlayerOnly();
         try {
-            final MediaPlayer next;
-            if (sequence.get(index) == -1) {
-                String uri = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("customDingUri", "");
-                next = uri.isEmpty() ? null : MediaPlayer.create(context, android.net.Uri.parse(uri));
-            } else {
-                next = MediaPlayer.create(context, sequence.get(index));
-            }
+            final MediaPlayer next = MediaPlayer.create(context, sequence.get(index));
             player = next;
             if (next == null) {
                 playAt(sequence, index + 1);
