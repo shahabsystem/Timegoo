@@ -43,6 +43,7 @@
 <Button android:id="@+id/testDing" android:text="▶ تست Ding انتخاب‌شده" android:background="@drawable/bg_button" android:layout_width="match_parent" android:layout_height="50dp"/>
 <Switch android:id="@+id/dingOnlyMode" android:text="🔔 فقط Ding؛ بدون اعلام ساعت" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:id="@+id/customDingStatus" android:text="Ding سفارشی: استفاده نمی‌شود" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/resetDing" android:text="↩ بازگشت Ding به تنظیمات پیش‌فرض" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="50dp"/>
 <Button android:id="@+id/pickCustomDing" android:text="🎵 افزودن / تغییر Ding از گوشی" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="50dp"/>
 </LinearLayout>
 
@@ -65,6 +66,18 @@
 <TextView android:text="اندازه فونت ساعت" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <SeekBar android:id="@+id/fontSize" android:max="36" android:progress="24" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:id="@+id/fontPreview" android:text="نمونه ساعت: ۱۲:۳۴" android:textColor="@color/gold_light" android:textSize="28sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="فونت صفحه اصلی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="14dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioGroup android:id="@+id/fontChoices" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+<RadioButton android:id="@+id/fontYekan" android:text="Yekan" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/fontVazir" android:text="Vazir" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/fontNazanin" android:text="Nazanin" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+</RadioGroup>
+<TextView android:text="زمینه صفحه اصلی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="14dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioGroup android:id="@+id/backgroundChoices" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+<RadioButton android:id="@+id/bgDefault" android:text="شب مدرن" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/bgWarm" android:text="گرم" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/bgPlain" android:text="ساده" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+</RadioGroup>
 <TextView android:text="رنگ تأکیدی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <RadioGroup android:id="@+id/colors" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
 <RadioButton android:id="@+id/blue" android:text="آبی" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>

@@ -44,13 +44,20 @@ public final class AudioTimeSpeaker {
     /** Scheduled clock announcement: when the user enables ding-only mode,
      * play only the selected ding and do not announce the time. */
     public void speakScheduledTime() {
-        Calendar now = Calendar.getInstance(Locale.US);
         android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
         if (p.getBoolean("dingOnlyMode", false)) {
+            // Scheduled announcements have a hard gate here: no hour/minute
+            // clips are ever added when Ding-only mode is enabled.
             playSelectedDing();
             return;
         }
+        Calendar now = Calendar.getInstance(Locale.US);
         speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
+    }
+
+    /** Explicit entry point used by the scheduled foreground service. */
+    public void playDingOnly() {
+        playSelectedDing();
     }
 
     public void speak(int hour, int minute) {

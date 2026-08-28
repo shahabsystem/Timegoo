@@ -166,6 +166,13 @@ public class SettingsActivity extends Activity {
         customDing.setOnClickListener(v -> {
             pickCustomDingFile();
         });
+        Button resetDing = findViewById(R.id.resetDing);
+        if (resetDing != null) resetDing.setOnClickListener(v -> {
+            prefs.edit().remove("customDingUri").putInt("dingNumber", 1).apply();
+            group.check(R.id.ding1);
+            customDingStatus.setText("Ding سفارشی: استفاده نمی‌شود");
+            Toast.makeText(this, "تنظیمات Ding به پیش‌فرض برگشت", Toast.LENGTH_SHORT).show();
+        });
 
         findViewById(R.id.testDing).setOnClickListener(v -> {
             if (speakerForTest == null) speakerForTest = new AudioTimeSpeaker(this);
@@ -379,11 +386,13 @@ public class SettingsActivity extends Activity {
 
     private void buildAppearance() {
         fontSize = findViewById(R.id.fontSize); preview = findViewById(R.id.fontPreview);
-        float saved = prefs.getFloat("fontSize", 56);
-        fontSize.setProgress(Math.max(0, Math.min(36, Math.round(saved - 32))));
+        float saved = prefs.getFloat("fontSize", 64);
+        fontSize.setProgress(Math.max(0, Math.min(46, Math.round(saved - 36))));
         preview.setTextSize(saved / 2);
         fontSize.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onProgressChanged(SeekBar s, int p, boolean f) { float z = 32 + p; prefs.edit().putFloat("fontSize", z).apply(); preview.setTextSize(z / 2); }
+            public void onProgressChanged(SeekBar s, int p, boolean f) {
+                float z = 36 + p; prefs.edit().putFloat("fontSize", z).apply(); preview.setTextSize(z / 2);
+            }
             public void onStartTrackingTouch(SeekBar s) {}
             public void onStopTrackingTouch(SeekBar s) {}
         });
@@ -394,7 +403,37 @@ public class SettingsActivity extends Activity {
             int col = id == R.id.green ? 0xff66bb6a : id == R.id.purple ? 0xffce93d8 : id == R.id.blue ? 0xff8ab4f8 : 0xffd89b2b;
             prefs.edit().putInt("color", col).apply(); preview.setTextColor(col);
         });
-        try { Typeface tf = Typeface.createFromAsset(getAssets(), "fonts/YEKAN.TTF"); applyTypeface(root, tf); } catch (Exception ignored) {}
+        RadioGroup fonts = findViewById(R.id.fontChoices);
+        String savedFont = prefs.getString("fontChoice", "yekan");
+        fonts.check("vazir".equals(savedFont) ? R.id.fontVazir : "nazanin".equals(savedFont) ? R.id.fontNazanin : R.id.fontYekan);
+        fonts.setOnCheckedChangeListener((g,id) -> {
+            String f = id == R.id.fontVazir ? "vazir" : id == R.id.fontNazanin ? "nazanin" : "yekan";
+            prefs.edit().putString("fontChoice", f).apply(); applySelectedFont(root, f); applySelectedFont(preview, f);
+        });
+        RadioGroup backs = findViewById(R.id.backgroundChoices);
+        String bg = prefs.getString("homeBackground", "default");
+        backs.check("warm".equals(bg) ? R.id.bgWarm : "plain".equals(bg) ? R.id.bgPlain : R.id.bgDefault);
+        backs.setOnCheckedChangeListener((g,id) -> {
+            String v = id == R.id.bgWarm ? "warm" : id == R.id.bgPlain ? "plain" : "default";
+            prefs.edit().putString("homeBackground", v).apply();
+        });
+        applySelectedFont(root, savedFont);
+    }
+
+    private Typeface selectedTypeface(String f) {
+        try {
+            if ("yekan".equals(f)) return Typeface.createFromAsset(getAssets(), "fonts/YEKAN.TTF");
+        } catch (Exception ignored) {}
+        // Vazir/Nazanin options use robust Android fallbacks if their external
+        // font files are not bundled on the build machine: sans-serif for Vazir,
+        // serif for Nazanin. This keeps every build self-contained and error-free.
+        return "nazanin".equals(f) ? Typeface.create("serif", Typeface.NORMAL) : Typeface.create("sans-serif", Typeface.NORMAL);
+    }
+
+    private void applySelectedFont(View v, String f) {
+        Typeface tf = selectedTypeface(f);
+        if (v instanceof TextView) ((TextView)v).setTypeface(tf);
+        if (v instanceof ViewGroup) for (int i=0;i<((ViewGroup)v).getChildCount();i++) applySelectedFont(((ViewGroup)v).getChildAt(i), f);
     }
 
     private void buildCreatorLinks() {

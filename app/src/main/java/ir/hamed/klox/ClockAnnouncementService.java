@@ -11,13 +11,20 @@ public class ClockAnnouncementService extends Service {
         super.onCreate(); createChannel();
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, CHANNEL) : new Notification.Builder(this);
         android.widget.RemoteViews rv = new android.widget.RemoteViews(getPackageName(), R.layout.notification_large);
-        rv.setTextViewText(R.id.notificationTitle, "سخنگوی ساعت");
+        rv.setTextViewText(R.id.notificationTitle, "تايمگو");
         rv.setTextViewText(R.id.notificationText, "در حال اعلام ساعت…");
-        b.setContentTitle("سخنگوی ساعت").setContentText("در حال اعلام ساعت…").setCustomContentView(rv).setContent(rv).setSmallIcon(R.drawable.ic_status_clock).setOngoing(true).setOnlyAlertOnce(true);
+        b.setContentTitle("تايمگو").setContentText("در حال اعلام ساعت…").setCustomContentView(rv).setContent(rv).setSmallIcon(R.drawable.ic_status_clock).setOngoing(true).setOnlyAlertOnce(true);
         startForeground(1201, b.build());
     }
     @Override public int onStartCommand(Intent intent,int flags,int startId){
-        speaker=new AudioTimeSpeaker(this); speaker.speakScheduledTime();
+        speaker=new AudioTimeSpeaker(this);
+        // Enforce the preference at the service boundary as well as inside the
+        // speaker, so a stale caller can never produce the full time in Ding-only mode.
+        if (getSharedPreferences("settings", MODE_PRIVATE).getBoolean("dingOnlyMode", false)) {
+            speaker.playDingOnly();
+        } else {
+            speaker.speakScheduledTime();
+        }
         new Thread(()->{try{Thread.sleep(15000);}catch(Exception ignored){} stopSelf();}).start();
         return START_NOT_STICKY;
     }
