@@ -17,7 +17,7 @@ public class ClockAnnouncementService extends Service {
         startForeground(1201, b.build());
     }
     @Override public int onStartCommand(Intent intent,int flags,int startId){
-        speaker=new AudioTimeSpeaker(this); speaker.speakCurrentTime();
+        speaker=new AudioTimeSpeaker(this); speaker.speakScheduledTime();
         new Thread(()->{try{Thread.sleep(15000);}catch(Exception ignored){} stopSelf();}).start();
         return START_NOT_STICKY;
     }

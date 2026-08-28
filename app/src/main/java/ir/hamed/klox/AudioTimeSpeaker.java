@@ -41,6 +41,18 @@ public final class AudioTimeSpeaker {
         speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
     }
 
+    /** Scheduled clock announcement: when the user enables ding-only mode,
+     * play only the selected ding and do not announce the time. */
+    public void speakScheduledTime() {
+        Calendar now = Calendar.getInstance(Locale.US);
+        android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        if (p.getBoolean("dingOnlyMode", false)) {
+            playSelectedDing();
+            return;
+        }
+        speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
+    }
+
     public void speak(int hour, int minute) {
         stop();
         List<Integer> sequence = buildSequence(hour, minute);
@@ -54,9 +66,7 @@ public final class AudioTimeSpeaker {
         List<Integer> ids = new ArrayList<>();
         android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
 
-        int dingNumber = p.getInt("dingNumber", 1);
-        if (dingNumber < 1 || dingNumber > 10) dingNumber = 1;
-        addIfExists(ids, raw("ding" + dingNumber));
+        addSelectedDing(ids, p);
 
         // Round the COMPLETE time to the nearest five minutes.
         // 01/02 -> :00, 03/04 -> :05, ... 58/59 -> next hour :00.
@@ -103,16 +113,32 @@ public final class AudioTimeSpeaker {
     }
 
     public void testSelectedDing() {
+        playSelectedDing();
+    }
+
+    private void playSelectedDing() {
         stop();
         android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
-        int n = p.getInt("dingNumber", 1);
-        if (n < 1 || n > 10) n = 1;
         List<Integer> one = new ArrayList<>();
-        addIfExists(one, raw("ding" + n));
+        addSelectedDing(one, p);
         if (one.isEmpty()) return;
         requestFocus();
         boostVolume();
         playAt(one, 0);
+    }
+
+    private void addSelectedDing(List<Integer> ids, android.content.SharedPreferences p) {
+        String custom = p.getString("customDingUri", "");
+        // Custom Ding is handled separately by playCustomDing(); resource list
+        // cannot directly contain a content URI.
+        if (!custom.isEmpty()) {
+            // Marker -1 means the custom URI should be played.
+            ids.add(-1);
+            return;
+        }
+        int dingNumber = p.getInt("dingNumber", 1);
+        if (dingNumber < 1 || dingNumber > 5) dingNumber = 1;
+        addIfExists(ids, raw("ding" + dingNumber));
     }
 
     private void addIfExists(List<Integer> ids, int id) {
@@ -131,7 +157,13 @@ public final class AudioTimeSpeaker {
         }
         releasePlayerOnly();
         try {
-            final MediaPlayer next = MediaPlayer.create(context, sequence.get(index));
+            final MediaPlayer next;
+            if (sequence.get(index) == -1) {
+                String custom = context.getSharedPreferences("settings", Context.MODE_PRIVATE).getString("customDingUri", "");
+                next = custom.isEmpty() ? null : MediaPlayer.create(context, android.net.Uri.parse(custom));
+            } else {
+                next = MediaPlayer.create(context, sequence.get(index));
+            }
             player = next;
             if (next == null) {
                 playAt(sequence, index + 1);

@@ -1,3 +1,8 @@
+## 5.0.7
+- Added optional scheduled-alert Ding-only mode.
+- Added custom Ding audio selection from device.
+- Existing built-in Ding selection remains available.
+
 # Changelog
 
 ## 5.0.6

@@ -21,6 +21,7 @@ public class SettingsActivity extends Activity {
     private static final int SLOTS = 7;
     private static final int REMINDERS = 5;
     private static final int PICK_REMINDER_AUDIO_BASE = 7100;
+    private static final int PICK_CUSTOM_DING = 7201;
     private AudioTimeSpeaker speakerForTest;
 
     @Override public void onCreate(Bundle b) {
@@ -141,6 +142,22 @@ public class SettingsActivity extends Activity {
                 if (id == ids[i]) { prefs.edit().putInt("dingNumber", i + 1).apply(); break; }
             }
         });
+        Switch dingOnly = findViewById(R.id.dingOnlyMode);
+        dingOnly.setChecked(prefs.getBoolean("dingOnlyMode", false));
+        dingOnly.setOnCheckedChangeListener((v, on) -> prefs.edit().putBoolean("dingOnlyMode", on).apply());
+
+        Button customDing = findViewById(R.id.pickCustomDing);
+        TextView customDingStatus = findViewById(R.id.customDingStatus);
+        String customUri = prefs.getString("customDingUri", "");
+        customDingStatus.setText(customUri.isEmpty() ? "Ding سفارشی: استفاده نمی‌شود" : "Ding سفارشی: انتخاب شده ✓");
+        customDing.setOnClickListener(v -> {
+            Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            i.addCategory(Intent.CATEGORY_OPENABLE);
+            i.setType("audio/*");
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            startActivityForResult(i, PICK_CUSTOM_DING);
+        });
+
         findViewById(R.id.testDing).setOnClickListener(v -> {
             if (speakerForTest == null) speakerForTest = new AudioTimeSpeaker(this);
             speakerForTest.testSelectedDing();
@@ -256,6 +273,15 @@ public class SettingsActivity extends Activity {
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_CUSTOM_DING && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri u = data.getData();
+            try { getContentResolver().takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION); } catch (Exception ignored) {}
+            prefs.edit().putString("customDingUri", u.toString()).apply();
+            TextView status = findViewById(R.id.customDingStatus);
+            if (status != null) status.setText("Ding سفارشی: انتخاب شده ✓");
+            Toast.makeText(this, "Ding سفارشی انتخاب شد", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (requestCode > PICK_REMINDER_AUDIO_BASE && requestCode <= PICK_REMINDER_AUDIO_BASE + REMINDERS
                 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             int slot = requestCode - PICK_REMINDER_AUDIO_BASE;

@@ -40,6 +40,9 @@
 <RadioButton android:id="@+id/ding5" android:text="Ding ۵" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 </RadioGroup>
 <Button android:id="@+id/testDing" android:text="▶ تست Ding انتخاب‌شده" android:background="@drawable/bg_button" android:layout_width="match_parent" android:layout_height="50dp"/>
+<Switch android:id="@+id/dingOnlyMode" android:text="🔔 فقط Ding؛ بدون اعلام ساعت" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/customDingStatus" android:text="Ding سفارشی: استفاده نمی‌شود" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/pickCustomDing" android:text="🎵 انتخاب Ding از گوشی" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="50dp"/>
 </LinearLayout>
 
 <LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
