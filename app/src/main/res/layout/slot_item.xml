@@ -8,6 +8,7 @@
 <Button android:id="@+id/start" android:text="شروع: ۰۷:۰۰" android:textColor="@color/text" android:background="@drawable/bg_outline_button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"/>
 <Button android:id="@+id/end" android:text="پایان: ۱۰:۰۰" android:textColor="@color/text" android:background="@drawable/bg_outline_button" android:layout_marginStart="8dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"/>
 </LinearLayout>
+<LinearLayout android:id="@+id/slotDays" android:orientation="vertical" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:id="@+id/intervalLabel" android:text="فاصله اعلام: ۶۰ دقیقه" android:textColor="@color/muted" android:textSize="14sp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"/>
 <SeekBar android:id="@+id/interval" android:max="119" android:progress="59" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 </LinearLayout>

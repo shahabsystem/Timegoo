@@ -32,7 +32,7 @@ public class ShakeService extends Service implements SensorEventListener {
     @Override public void onCreate() {
         super.onCreate(); createChannel();
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, CHANNEL) : new Notification.Builder(this);
-        b.setContentTitle("سخنگوی ساعت").setContentText("اعلام ساعت با تکان دادن فعال است").setSmallIcon(R.drawable.ic_status_clock).setOngoing(true).setOnlyAlertOnce(true);
+        b.setContentTitle("سخنگوی ساعت").setContentText("اعلام ساعت با تکان دادن فعال است").setSmallIcon(R.mipmap.ic_launcher_modern).setOngoing(true).setOnlyAlertOnce(true);
         startForeground(NOTIFICATION_ID, b.build());
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
         if(sensorManager!=null){ accelerometer=sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER); if(accelerometer!=null) sensorManager.registerListener(this,accelerometer,SensorManager.SENSOR_DELAY_GAME); }

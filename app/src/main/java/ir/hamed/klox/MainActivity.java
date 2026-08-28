@@ -1,8 +1,7 @@
 package ir.hamed.klox;
 import android.app.*;import android.content.*;import android.content.pm.PackageManager;import android.graphics.Typeface;import android.os.*;import android.Manifest;import android.view.*;import android.widget.*;import java.text.SimpleDateFormat;import java.util.*;
 public class MainActivity extends Activity{private TextView clock,date,statusText;private AudioTimeSpeaker speaker;private SharedPreferences prefs;
-@Override public void onCreate(Bundle b){super.onCreate(b);setContentView(R.layout.activity_main);prefs=getSharedPreferences("settings",MODE_PRIVATE);clock=findViewById(R.id.clock);date=findViewById(R.id.date);statusText=findViewById(R.id.statusText);applyPrefs();speaker=new AudioTimeSpeaker(this);findViewById(R.id.speak).setOnClickListener(v->speakTime());findViewById(R.id.settings).setOnClickListener(v->startActivity(new Intent(this,SettingsActivity.class)));findViewById(R.id.exit).setOnClickListener(v->exitNow());updateClock();ScheduleManager.scheduleNext(this);ReminderManager.schedule(this);updatePersistentNotification(this);if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},900);}
-@Override protected void onResume(){super.onResume();if(clock!=null){applyPrefs();updateClock();updatePersistentNotification(this);}}
+@Override public void onCreate(Bundle b){super.onCreate(b);setContentView(R.layout.activity_main);prefs=getSharedPreferences("settings",MODE_PRIVATE);clock=findViewById(R.id.clock);date=findViewById(R.id.date);statusText=findViewById(R.id.statusText);applyPrefs();speaker=new AudioTimeSpeaker(this);findViewById(R.id.speak).setOnClickListener(v->speakTime());findViewById(R.id.settings).setOnClickListener(v->startActivity(new Intent(this,SettingsActivity.class)));findViewById(R.id.exit).setOnClickListener(v->exitNow());updateClock();ScheduleManager.scheduleNext(this);ReminderManager.schedule(this);updatePersistentNotification(this);if(prefs.getBoolean("shakeToSpeak",false)){try{ShakeService.start(this);}catch(Exception ignored){}}if(Build.VERSION.SDK_INT>=33&&checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED)requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},900);}
 private void updateClock(){String time=new SimpleDateFormat("HH:mm",Locale.US).format(new Date());String d=formattedDate(new Date(),prefs.getString("dateMode","jalali"));clock.setText(toPersian(time));date.setText(toPersian(d));statusText.setText(prefs.getBoolean("enabled",true)?"فعال • زمان‌بندی در پس‌زمینه روشن است":"غیرفعال");statusText.setTextColor(prefs.getBoolean("enabled",true)?0xff21d07a:0xffff6b6b);}
 private String toPersian(String s){return s.replace('0','۰').replace('1','۱').replace('2','۲').replace('3','۳').replace('4','۴').replace('5','۵').replace('6','۶').replace('7','۷').replace('8','۸').replace('9','۹');}
 private void speakTime(){if(speaker!=null)speaker.speakCurrentTime();}
@@ -30,11 +29,15 @@ public static void updatePersistentNotification(Context ctx){
  String mode=p.getString("dateMode","jalali"); Calendar now=Calendar.getInstance(); String time=new SimpleDateFormat("HH:mm",Locale.US).format(now.getTime());
  String date;
  if("gregorian".equals(mode)) date=new SimpleDateFormat("yyyy/MM/dd",Locale.US).format(now.getTime()); else {int[] j=jalali(now.get(Calendar.YEAR),now.get(Calendar.MONTH)+1,now.get(Calendar.DAY_OF_MONTH));date=String.format(Locale.US,"%04d/%02d/%02d",j[0],j[1],j[2]);}
+ String notificationText=toPersianStatic(time)+" • "+toPersianStatic(date);
+ android.widget.RemoteViews rv=new android.widget.RemoteViews(ctx.getPackageName(),R.layout.notification_large);
+ rv.setTextViewText(R.id.notificationTitle,"تايمگو");
+ rv.setTextViewText(R.id.notificationText,notificationText);
  Notification n;
  if(Build.VERSION.SDK_INT>=26){
-  n=new Notification.Builder(ctx,ch).setSmallIcon(R.drawable.ic_status_clock).setContentTitle("تايمگو").setContentText(toPersianStatic(time)+" • "+toPersianStatic(date)).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx,ch).setSmallIcon(R.mipmap.ic_launcher_modern).setCustomContentView(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }else{
-  n=new Notification.Builder(ctx).setSmallIcon(R.drawable.ic_status_clock).setContentTitle("تايمگو").setContentText(toPersianStatic(time)+" • "+toPersianStatic(date)).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx).setSmallIcon(R.mipmap.ic_launcher_modern).setContent(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }
  nm.notify(1701,n);
 }
