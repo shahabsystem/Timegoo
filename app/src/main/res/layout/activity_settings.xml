@@ -25,10 +25,10 @@
 <RadioButton android:id="@+id/ding3" android:text="Ding ۳" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <RadioButton android:id="@+id/ding4" android:text="Ding ۴" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <RadioButton android:id="@+id/ding5" android:text="Ding ۵" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/dingCustom" android:text="🎵 صدای انتخابی از گوشی" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 </RadioGroup>
-<TextView android:id="@+id/customDingStatus" android:text="Ding انتخابی: یکی از صداهای داخلی" android:textColor="@color/muted" android:textSize="13sp" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<Button android:id="@+id/pickCustomDing" android:text="🎵 انتخاب Ding از گوشی" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="48dp"/>
-<Switch android:id="@+id/dingOnlyMode" android:text="فقط Ding؛ بدون اعلام ساعت در زمان‌بندی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Switch android:id="@+id/dingOnlyMode" android:text="فقط Ding؛ بدون اعلام ساعت" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<Button android:id="@+id/pickCustomDing" android:text="🎵 انتخاب/تغییر Ding از گوشی" android:background="@drawable/bg_outline_button" android:layout_marginTop="6dp" android:layout_width="match_parent" android:layout_height="48dp"/>
 <Button android:id="@+id/testDing" android:text="▶ تست Ding انتخاب‌شده" android:background="@drawable/bg_button" android:layout_width="match_parent" android:layout_height="50dp"/>
 </LinearLayout>
 <LinearLayout android:orientation="vertical" android:background="@drawable/bg_card" android:padding="14dp" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">

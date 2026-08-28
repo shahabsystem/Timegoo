@@ -5,7 +5,6 @@ import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 
 import java.util.ArrayList;
@@ -13,7 +12,17 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-/** Serial audio playback for Timegoo clock announcements. */
+/**
+ * Audio clock built around the three original feminine clip families:
+ *
+ *   bN.mp3   = exact hour (top of the hour)
+ *   bN_.mp3  = hour phrase used when minutes follow
+ *   bNm.mp3  = minute, rounded to five-minute steps
+ *
+ * The announcement time is rounded to the nearest five minutes. If rounding
+ * crosses :55, the hour rolls forward and the exact-hour clip b(N+1) is used.
+ * Playback is strictly serialized: Ding -> hour -> minute.
+ */
 public final class AudioTimeSpeaker {
     private final Context context;
     private final AudioManager audioManager;
@@ -27,67 +36,78 @@ public final class AudioTimeSpeaker {
         audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
     }
 
-    /** Manual announcement: Ding (selected) + current time. */
     public void speakCurrentTime() {
         Calendar now = Calendar.getInstance(Locale.US);
         speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
     }
 
-    /** Scheduled announcement. Ding-only mode applies ONLY to scheduled announcements. */
+    /** Used by scheduled announcements. If Ding-only is enabled, stop after the Ding. */
     public void speakScheduledTime() {
+        Calendar now = Calendar.getInstance(Locale.US);
         android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
         if (p.getBoolean("dingOnlyMode", false)) {
             playSelectedDing();
-            return;
+        } else {
+            speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
         }
-        Calendar now = Calendar.getInstance(Locale.US);
-        speak(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
     }
 
     public void speak(int hour, int minute) {
         stop();
-        List<Integer> timeSequence = buildTimeSequence(hour, minute);
-        if (timeSequence.isEmpty() && getCustomDingUri().isEmpty()) return;
+        List<Integer> sequence = buildSequence(hour, minute);
+        if (sequence.isEmpty()) return;
         requestFocus();
         boostVolume();
-
-        String custom = getCustomDingUri();
-        if (!custom.isEmpty()) {
-            playUriThenResources(custom, timeSequence);
-        } else {
-            List<Integer> sequence = new ArrayList<>();
-            int dingNumber = getSelectedDingNumber();
-            addIfExists(sequence, raw("ding" + dingNumber));
-            sequence.addAll(timeSequence);
-            playAt(sequence, 0);
-        }
+        playAt(sequence, 0);
     }
 
-    private List<Integer> buildTimeSequence(int hour, int minute) {
+    private List<Integer> buildSequence(int hour, int minute) {
         List<Integer> ids = new ArrayList<>();
+        android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        addSelectedDing(ids, p);
+
+        // Round the COMPLETE time to the nearest five minutes.
+        // 01/02 -> :00, 03/04 -> :05, ... 58/59 -> next hour :00.
         int h = Math.floorMod(hour, 24);
         int m = Math.max(0, Math.min(59, minute));
-
         int rounded = ((m + 2) / 5) * 5;
         if (rounded >= 60) {
             rounded = 0;
             h = (h + 1) % 24;
         }
 
+        boolean numericOnly = p.getBoolean("numericOnly", false);
+
         if (rounded == 0) {
+            // At a rounded exact hour, the original bN clip is the correct
+            // single hour announcement.
             int exactHour = raw("b" + h);
             if (exactHour == 0) exactHour = raw("b" + h + "_");
             addIfExists(ids, exactHour);
             return ids;
         }
 
+        // When minutes follow, bN_ is the dedicated hour-with-minute clip.
+        // Never use bN here: it is the exact-hour clip and causes duplicated
+        // constructions such as "ساعت ۹ ساعت ۲۳".
         int hourWithMinute = raw("b" + h + "_");
         if (hourWithMinute == 0) hourWithMinute = raw("b" + h);
         addIfExists(ids, hourWithMinute);
 
+        // The source audio set provides feminine minute clips only in five-
+        // minute steps. Use the rounded five-minute clip directly.
         int minuteClip = raw("b" + rounded + "m");
-        if (minuteClip == 0) minuteClip = raw("b" + rounded + "_");
+        if (minuteClip == 0) {
+            // Defensive fallback for a damaged/incomplete resource set.
+            minuteClip = raw("b" + rounded + "_");
+        }
         addIfExists(ids, minuteClip);
+
+        // numericOnly is retained for backwards compatibility with the UI.
+        // With the original supplied audio set there is no separate bare-hour
+        // recording; therefore we keep the same audio-safe clip mapping rather
+        // than silently dropping the hour.
         return ids;
     }
 
@@ -97,28 +117,31 @@ public final class AudioTimeSpeaker {
 
     private void playSelectedDing() {
         stop();
+        android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+        List<Integer> one = new ArrayList<>();
+        String custom = p.getBoolean("dingUseCustom", false) ? p.getString("customDingUri", "") : "";
+        if (custom.isEmpty()) {
+            int n = p.getInt("dingNumber", 1);
+            if (n < 1 || n > 5) n = 1;
+            addIfExists(one, raw("ding" + n));
+        } else {
+            one.add(-1); // custom content URI marker
+        }
+        if (one.isEmpty()) return;
         requestFocus();
         boostVolume();
-        String custom = getCustomDingUri();
-        if (!custom.isEmpty()) {
-            playUriThenResources(custom, new ArrayList<>());
-            return;
-        }
-        List<Integer> one = new ArrayList<>();
-        addIfExists(one, raw("ding" + getSelectedDingNumber()));
-        if (one.isEmpty()) { stop(); return; }
         playAt(one, 0);
     }
 
-    private int getSelectedDingNumber() {
-        int n = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                .getInt("dingNumber", 1);
-        return (n < 1 || n > 5) ? 1 : n;
-    }
-
-    private String getCustomDingUri() {
-        return context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                .getString("customDingUri", "");
+    private void addSelectedDing(List<Integer> ids, android.content.SharedPreferences p) {
+        String custom = p.getBoolean("dingUseCustom", false) ? p.getString("customDingUri", "") : "";
+        if (!custom.isEmpty()) {
+            ids.add(-1); // custom content URI marker
+            return;
+        }
+        int dingNumber = p.getInt("dingNumber", 1);
+        if (dingNumber < 1 || dingNumber > 5) dingNumber = 1;
+        addIfExists(ids, raw("ding" + dingNumber));
     }
 
     private void addIfExists(List<Integer> ids, int id) {
@@ -129,34 +152,6 @@ public final class AudioTimeSpeaker {
         return context.getResources().getIdentifier(name, "raw", context.getPackageName());
     }
 
-    private void playUriThenResources(String uriString, List<Integer> nextResources) {
-        releasePlayerOnly();
-        try {
-            final MediaPlayer next = MediaPlayer.create(context, Uri.parse(uriString));
-            player = next;
-            if (next == null) {
-                if (nextResources.isEmpty()) { stop(); return; }
-                playAt(nextResources, 0);
-                return;
-            }
-            configurePlayer(next);
-            next.setOnCompletionListener(mp -> {
-                try { mp.release(); } catch (Exception ignored) { }
-                if (player == mp) player = null;
-                if (nextResources.isEmpty()) stop(); else playAt(nextResources, 0);
-            });
-            next.setOnErrorListener((mp, what, extra) -> {
-                try { mp.release(); } catch (Exception ignored) { }
-                if (player == mp) player = null;
-                if (nextResources.isEmpty()) stop(); else playAt(nextResources, 0);
-                return true;
-            });
-            next.start();
-        } catch (Exception ignored) {
-            if (nextResources.isEmpty()) stop(); else playAt(nextResources, 0);
-        }
-    }
-
     private void playAt(final List<Integer> sequence, final int index) {
         if (index >= sequence.size()) {
             restoreVolume();
@@ -165,10 +160,39 @@ public final class AudioTimeSpeaker {
         }
         releasePlayerOnly();
         try {
-            final MediaPlayer next = MediaPlayer.create(context, sequence.get(index));
+            final MediaPlayer next;
+            if (sequence.get(index) == -1) {
+                android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+                String custom = p.getBoolean("dingUseCustom", false) ? p.getString("customDingUri", "") : "";
+                next = custom.isEmpty() ? null : MediaPlayer.create(context, android.net.Uri.parse(custom));
+            } else {
+                next = MediaPlayer.create(context, sequence.get(index));
+            }
             player = next;
-            if (next == null) { playAt(sequence, index + 1); return; }
-            configurePlayer(next);
+            if (next == null) {
+                // A stale/unreadable custom URI must never make the whole alert silent.
+                // Fall back to the selected built-in Ding for the marker entry.
+                if (sequence.get(index) == -1) {
+                    android.content.SharedPreferences p = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+                    int n = p.getInt("dingNumber", 1);
+                    if (n < 1 || n > 5) n = 1;
+                    int fallback = raw("ding" + n);
+                    if (fallback != 0) {
+                        List<Integer> fallbackSeq = new ArrayList<>();
+                        fallbackSeq.add(fallback);
+                        playAt(fallbackSeq, 0);
+                        return;
+                    }
+                }
+                playAt(sequence, index + 1);
+                return;
+            }
+            if (Build.VERSION.SDK_INT >= 21) {
+                next.setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build());
+            }
             next.setOnCompletionListener(mp -> {
                 try { mp.release(); } catch (Exception ignored) { }
                 if (player == mp) player = null;
@@ -180,26 +204,18 @@ public final class AudioTimeSpeaker {
                 playAt(sequence, index + 1);
                 return true;
             });
+            if (Build.VERSION.SDK_INT >= 23) {
+                float speed = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+                        .getInt("announcementSpeed", 100) / 100f;
+                try {
+                    next.setPlaybackParams(new android.media.PlaybackParams()
+                            .setSpeed(speed)
+                            .setPitch(1.0f));
+                } catch (Exception ignored) { }
+            }
             next.start();
         } catch (Exception ignored) {
             playAt(sequence, index + 1);
-        }
-    }
-
-    private void configurePlayer(MediaPlayer next) {
-        if (Build.VERSION.SDK_INT >= 21) {
-            next.setAudioAttributes(new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .build());
-        }
-        if (Build.VERSION.SDK_INT >= 23) {
-            float speed = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-                    .getInt("announcementSpeed", 100) / 100f;
-            try {
-                next.setPlaybackParams(new android.media.PlaybackParams()
-                        .setSpeed(speed).setPitch(1.0f));
-            } catch (Exception ignored) { }
         }
     }
 
@@ -212,7 +228,8 @@ public final class AudioTimeSpeaker {
                             .setUsage(AudioAttributes.USAGE_MEDIA)
                             .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                             .build())
-                    .setOnAudioFocusChangeListener(focusListener).build();
+                    .setOnAudioFocusChangeListener(focusListener)
+                    .build();
             audioManager.requestAudioFocus(focusRequest);
         } else {
             audioManager.requestAudioFocus(focusListener, AudioManager.STREAM_MUSIC,
