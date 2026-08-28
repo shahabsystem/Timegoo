@@ -92,6 +92,5 @@ jobs:
           name: sayclock-apks
           path: |
             ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
-            ${{ env.PROJECT_DIR }}/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 30
