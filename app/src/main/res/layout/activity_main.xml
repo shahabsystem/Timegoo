@@ -1,32 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:fillViewport="true" android:background="@color/bg" android:layout_width="match_parent" android:layout_height="match_parent">
-<LinearLayout android:id="@+id/root" android:orientation="vertical" android:padding="18dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-<LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-<ImageView android:id="@+id/icon" android:src="@mipmap/ic_launcher_modern" android:contentDescription="ساعت" android:layout_width="64dp" android:layout_height="64dp"/>
-<LinearLayout android:orientation="vertical" android:layout_marginStart="14dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
-<TextView android:text="تايمگو" android:textColor="@color/text" android:textSize="25sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:text="اعلام خودکار ساعت با صدای فارسی" android:textColor="@color/muted" android:textSize="14sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout>
-</LinearLayout>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#050B14">
 
-<LinearLayout android:orientation="vertical" android:gravity="center" android:background="@drawable/bg_time" android:layout_marginTop="18dp" android:padding="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-<TextView android:text="ساعت فعلی" android:textColor="@color/gold_light" android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/clock" android:text="۱۴:۳۰" android:textColor="@color/gold_light" android:textSize="68sp" android:textStyle="bold" android:gravity="center" android:layout_marginTop="4dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/date" android:text="۱۴۰۴/۰۵/۲۶" android:textColor="@color/muted" android:textSize="24sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout>
+    <ImageView
+        android:id="@+id/homeBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/bg_home_landscape"
+        android:contentDescription="پس‌زمینه" />
 
-<LinearLayout android:orientation="horizontal" android:gravity="center_vertical" android:background="@drawable/bg_card" android:layout_marginTop="14dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-<View android:id="@+id/statusDot" android:background="@color/green" android:layout_width="12dp" android:layout_height="12dp"/>
-<LinearLayout android:orientation="vertical" android:layout_marginStart="12dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content">
-<TextView android:text="وضعیت برنامه" android:textColor="@color/text" android:textSize="16sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-<TextView android:id="@+id/statusText" android:text="فعال" android:textColor="@color/green" android:textSize="14sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout>
-</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#55030A12" />
 
-<Button android:id="@+id/speak" android:text="اعلام ساعت الآن" android:textColor="#15110A" android:textStyle="bold" android:textSize="16sp" android:background="@drawable/bg_button" android:layout_marginTop="16dp" android:layout_width="match_parent" android:layout_height="54dp"/>
-<LinearLayout android:orientation="horizontal" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="54dp">
-<Button android:id="@+id/settings" android:text="تنظیمات" android:textColor="@color/text" android:textSize="16sp" android:background="@drawable/bg_outline_button" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"/>
-<Button android:id="@+id/exit" android:text="خروج" android:textColor="#FF9B9B" android:textSize="16sp" android:background="@drawable/bg_outline_button" android:layout_marginStart="10dp" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"/>
-</LinearLayout>
-<TextView android:text="از پيشنهادات براي توسعه استقبال مي شود" android:textColor="@color/muted" android:textSize="12sp" android:gravity="center" android:layout_marginTop="18dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-</LinearLayout></ScrollView>
+    <ScrollView
+        android:id="@+id/homeScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:background="@android:color/transparent"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="18dp"
+            android:paddingBottom="28dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <ImageView
+                    android:id="@+id/icon"
+                    android:src="@mipmap/ic_launcher_modern"
+                    android:contentDescription="ساعت"
+                    android:layout_width="76dp"
+                    android:layout_height="76dp" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="14dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="تایمگو"
+                        android:textColor="#F4B94F"
+                        android:textSize="29sp"
+                        android:textStyle="bold"
+                        android:gravity="end"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:text="اعلام و مدیریت ساعت با صدای فارسی"
+                        android:textColor="#D6DCE6"
+                        android:textSize="14sp"
+                        android:gravity="end"
+                        android:layout_marginTop="2dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_time"
+                android:layout_marginTop="18dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="22dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="ساعت فعلی"
+                    android:textColor="#F6C35D"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/clock"
+                    android:text="۱۴:۳۰"
+                    android:textColor="#F6C35D"
+                    android:textSize="82sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:layout_marginTop="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+                <View
+                    android:layout_width="170dp"
+                    android:layout_height="1dp"
+                    android:background="#88E9B64B"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="8dp" />
+                <TextView
+                    android:id="@+id/date"
+                    android:text="۱۴۰۵/۰۶/۰۷"
+                    android:textColor="#E7ECF4"
+                    android:textSize="31sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:layout_marginTop="14dp"
+                android:padding="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <View
+                    android:id="@+id/statusDot"
+                    android:background="@drawable/status_dot"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp" />
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:gravity="end"
+                    android:layout_marginStart="14dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:text="وضعیت برنامه"
+                        android:textColor="#F5F7FA"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:gravity="end"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/statusText"
+                        android:text="فعال • زمان‌بندی در پس‌زمینه روشن است"
+                        android:textColor="#32D889"
+                        android:textSize="14sp"
+                        android:gravity="end"
+                        android:layout_marginTop="3dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/speak"
+                android:text="🔔  اعلام ساعت الآن"
+                android:textColor="#171109"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:background="@drawable/bg_button"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="62dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="11dp"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+                <Button
+                    android:id="@+id/settings"
+                    android:text="⚙  تنظیمات"
+                    android:textColor="#F2F5FA"
+                    android:textSize="17sp"
+                    android:background="@drawable/bg_outline_button"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent" />
+                <Button
+                    android:id="@+id/exit"
+                    android:text="خروج  ⇥"
+                    android:textColor="#FF9B9B"
+                    android:textSize="17sp"
+                    android:background="@drawable/bg_outline_button"
+                    android:layout_marginStart="10dp"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:background="@drawable/bg_card"
+                android:layout_marginTop="14dp"
+                android:padding="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="72dp">
+                    <TextView android:text="۷" android:textColor="#F4B94F" android:textSize="24sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="اعلام روزانه" android:textColor="#C6CFDC" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+                <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="72dp">
+                    <TextView android:text="۵" android:textColor="#F4B94F" android:textSize="24sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="یادآوری" android:textColor="#C6CFDC" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+                <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="72dp">
+                    <TextView android:text="✓" android:textColor="#32D889" android:textSize="24sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="اجرای پس‌زمینه" android:textColor="#C6CFDC" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+                <LinearLayout android:gravity="center" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="72dp">
+                    <TextView android:text="♪" android:textColor="#8AB4F8" android:textSize="24sp" android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <TextView android:text="صدای فارسی" android:textColor="#C6CFDC" android:textSize="12sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:text="🛡  توجه: برنامه برای ارائه سرویس در پس‌زمینه اجرا می‌شود."
+                android:textColor="#B7C0CE"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:text="تايمگو • مدیریت ساده و دقیق زمان"
+                android:textColor="#778496"
+                android:textSize="11sp"
+                android:gravity="center"
+                android:layout_marginTop="7dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
