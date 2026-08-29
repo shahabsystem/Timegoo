@@ -18,14 +18,8 @@
 ## سازنده
 - ایمیل: hamedmohammadinikche@gmail.com
 - پروژه‌های دیگر: https://github.com/shahabsystem
-- قهوه: https://coffeebede.com/shahabsystem
-- حمایت نقدی: https://reymit.ir/shahabsystem
+- قهوه: https://coffeebede.com/shahabsyste
 
-## ساخت APK با GitHub Actions
-پس از push به شاخه `main` یا `master`، ورک‌فلو `.github/workflows/android.yml` به‌صورت خودکار اجرا می‌شود.
-
-دو خروجی به عنوان Artifact ساخته می‌شود:
-- `debug APK` برای نصب و تست سریع
 - `release APK` بدون امضای شخصی، برای مرحله انتشار
 
 برای انتشار عمومی، بهتر است APK نهایی با کلید امضای اختصاصی پروژه در GitHub Secrets امضا شود.
