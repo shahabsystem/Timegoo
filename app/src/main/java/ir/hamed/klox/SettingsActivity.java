@@ -161,8 +161,8 @@ public class SettingsActivity extends Activity {
 
         Button customDing = findViewById(R.id.pickCustomDing);
         TextView customDingStatus = findViewById(R.id.customDingStatus);
-        String customUri = prefs.getString("customDingUri", "");
-        customDingStatus.setText(customUri.isEmpty() ? "Ding سفارشی: استفاده نمی‌شود" : "Ding سفارشی: انتخاب شده ✓");
+        String currentCustomUri = prefs.getString("customDingUri", "");
+        customDingStatus.setText(currentCustomUri.isEmpty() ? "Ding سفارشی: استفاده نمی‌شود" : "Ding سفارشی: انتخاب شده ✓");
         customDing.setOnClickListener(v -> {
             pickCustomDingFile();
         });
@@ -422,11 +422,9 @@ public class SettingsActivity extends Activity {
 
     private Typeface selectedTypeface(String f) {
         try {
+            if ("vazir".equals(f)) return Typeface.createFromAsset(getAssets(), "fonts/Vazir.ttf");
             if ("yekan".equals(f)) return Typeface.createFromAsset(getAssets(), "fonts/YEKAN.TTF");
         } catch (Exception ignored) {}
-        // Vazir/Nazanin options use robust Android fallbacks if their external
-        // font files are not bundled on the build machine: sans-serif for Vazir,
-        // serif for Nazanin. This keeps every build self-contained and error-free.
         return "nazanin".equals(f) ? Typeface.create("serif", Typeface.NORMAL) : Typeface.create("sans-serif", Typeface.NORMAL);
     }
 

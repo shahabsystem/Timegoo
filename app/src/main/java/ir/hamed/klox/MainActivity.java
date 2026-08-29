@@ -7,7 +7,7 @@ private String toPersian(String s){return s.replace('0','۰').replace('1','۱').
 private void speakTime(){if(speaker!=null)speaker.speakCurrentTime();}
 private void applyPrefs(){float size=prefs.getFloat("fontSize",56);clock.setTextSize(size);date.setTextSize(Math.max(18,size*.42f));
 String font=prefs.getString("fontChoice","yekan");
-try { Typeface tf; if("yekan".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/YEKAN.TTF"); else tf="nazanin".equals(font)?Typeface.create("serif",Typeface.NORMAL):Typeface.create("sans-serif",Typeface.NORMAL); clock.setTypeface(tf); date.setTypeface(tf); } catch(Exception ignored){}int color=prefs.getInt("color",0xffd89b2b);clock.setTextColor(color);getWindow().setStatusBarColor(0xff080e17);int bgId = R.drawable.bg_home;
+try { Typeface tf; if("vazir".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/Vazir.ttf"); else if("yekan".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/YEKAN.TTF"); else tf=Typeface.create("serif",Typeface.NORMAL); clock.setTypeface(tf); date.setTypeface(tf); } catch(Exception ignored){}int color=prefs.getInt("color",0xffd89b2b);clock.setTextColor(color);getWindow().setStatusBarColor(0xff080e17);int bgId = R.drawable.bg_home;
 String bg = prefs.getString("homeBackground","default");
 if("warm".equals(bg)) bgId = R.drawable.bg_home_warm; else if("plain".equals(bg)) bgId = R.drawable.bg_home_plain;
 findViewById(R.id.root).setBackgroundResource(bgId);}
