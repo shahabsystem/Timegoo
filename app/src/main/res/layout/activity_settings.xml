@@ -8,6 +8,9 @@
 <TextView android:text="عمومی" android:textColor="@color/gold_light" android:textSize="18sp" android:textStyle="bold" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <Switch android:id="@+id/master" android:text="فعال بودن برنامه" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <Switch android:id="@+id/shakeToSpeak" android:text="اعلام ساعت با تکان دادن گوشی" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:text="حساسیت تکان دادن گوشی" android:textColor="@color/text" android:textSize="15sp" android:layout_marginTop="10dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<SeekBar android:id="@+id/shakeSensitivity" android:max="100" android:progress="55" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<TextView android:id="@+id/shakeSensitivityLabel" android:text="متوسط" android:textColor="@color/gold_light" android:textSize="13sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:text="برای جلوگیری از اعلام ناخواسته، تکان نسبتاً شدید و با فاصله زمانی کوتاه تشخیص داده می‌شود. این قابلیت حتی وقتی از برنامه خارج می‌شوی هم فعال می‌ماند؛ برای بهترین عملکرد، محدودیت باتری را از بخش زیر حذف کن." android:textColor="@color/muted" android:textSize="12sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <Switch android:id="@+id/persistentNotification" android:text="نمایش دائمی ساعت و تاریخ در نوتیفیکیشن" android:textColor="@color/text" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:text="تاریخ نوتیفیکیشن مطابق انتخاب شمسی یا میلادی نمایش داده می‌شود." android:textColor="@color/muted" android:textSize="12sp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
@@ -74,9 +77,10 @@
 </RadioGroup>
 <TextView android:text="زمینه صفحه اصلی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="14dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <RadioGroup android:id="@+id/backgroundChoices" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-<RadioButton android:id="@+id/bgDefault" android:text="شب مدرن" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/bgDefault" android:text="منظره شب" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 <RadioButton android:id="@+id/bgWarm" android:text="گرم" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 <RadioButton android:id="@+id/bgPlain" android:text="ساده" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+<RadioButton android:id="@+id/bgLandscape" android:text="منظره" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 </RadioGroup>
 <TextView android:text="رنگ تأکیدی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <RadioGroup android:id="@+id/colors" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">

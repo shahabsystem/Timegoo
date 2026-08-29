@@ -52,6 +52,20 @@ public class SettingsActivity extends Activity {
             }
         });
 
+        SeekBar shakeSensitivity = findViewById(R.id.shakeSensitivity);
+        TextView shakeSensitivityLabel = findViewById(R.id.shakeSensitivityLabel);
+        int savedShake = Math.max(0, Math.min(100, prefs.getInt("shakeSensitivity", 55)));
+        shakeSensitivity.setProgress(savedShake);
+        updateShakeSensitivityLabel(shakeSensitivityLabel, savedShake);
+        shakeSensitivity.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar bar, int value, boolean fromUser) {
+                updateShakeSensitivityLabel(shakeSensitivityLabel, value);
+                if (fromUser) prefs.edit().putInt("shakeSensitivity", value).apply();
+            }
+            public void onStartTrackingTouch(SeekBar bar) {}
+            public void onStopTrackingTouch(SeekBar bar) { prefs.edit().putInt("shakeSensitivity", bar.getProgress()).apply(); }
+        });
+
         buildSlots();
         buildDingSelection();
         buildVolume();
@@ -384,6 +398,14 @@ public class SettingsActivity extends Activity {
         });
     }
 
+    private void updateShakeSensitivityLabel(TextView label, int value) {
+        String text;
+        if (value < 30) text = "زیاد — با تکان‌های سبک‌تر";
+        else if (value < 70) text = "متوسط";
+        else text = "کم — مناسب خودرو و مسیرهای پرلرزش";
+        label.setText(text);
+    }
+
     private void buildAppearance() {
         fontSize = findViewById(R.id.fontSize); preview = findViewById(R.id.fontPreview);
         float saved = prefs.getFloat("fontSize", 64);
@@ -412,9 +434,9 @@ public class SettingsActivity extends Activity {
         });
         RadioGroup backs = findViewById(R.id.backgroundChoices);
         String bg = prefs.getString("homeBackground", "default");
-        backs.check("warm".equals(bg) ? R.id.bgWarm : "plain".equals(bg) ? R.id.bgPlain : R.id.bgDefault);
+        backs.check("warm".equals(bg) ? R.id.bgWarm : "plain".equals(bg) ? R.id.bgPlain : "landscape".equals(bg) ? R.id.bgLandscape : R.id.bgDefault);
         backs.setOnCheckedChangeListener((g,id) -> {
-            String v = id == R.id.bgWarm ? "warm" : id == R.id.bgPlain ? "plain" : "default";
+            String v = id == R.id.bgWarm ? "warm" : id == R.id.bgPlain ? "plain" : id == R.id.bgLandscape ? "landscape" : "default";
             prefs.edit().putString("homeBackground", v).apply();
         });
         applySelectedFont(root, savedFont);

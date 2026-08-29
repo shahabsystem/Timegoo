@@ -10,7 +10,7 @@
     <TextView
         android:id="@+id/notificationTitle"
         android:textColor="#FFFFFFFF"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:maxLines="1"
         android:ellipsize="end"
@@ -19,8 +19,8 @@
     <TextView
         android:id="@+id/notificationText"
         android:textColor="#FFE0E0E0"
-        android:textSize="18sp"
-        android:maxLines="2"
+        android:textSize="24sp"
+        android:maxLines="1"
         android:ellipsize="end"
         android:layout_marginTop="2dp"
         android:layout_width="match_parent"

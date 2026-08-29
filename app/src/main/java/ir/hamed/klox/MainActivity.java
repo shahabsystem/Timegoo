@@ -5,11 +5,11 @@ public class MainActivity extends Activity{private TextView clock,date,statusTex
 private void updateClock(){String time=new SimpleDateFormat("HH:mm",Locale.US).format(new Date());String d=formattedDate(new Date(),prefs.getString("dateMode","jalali"));clock.setText(toPersian(time));date.setText(toPersian(d));statusText.setText(prefs.getBoolean("enabled",true)?"فعال • زمان‌بندی در پس‌زمینه روشن است":"غیرفعال");statusText.setTextColor(prefs.getBoolean("enabled",true)?0xff21d07a:0xffff6b6b);}
 private String toPersian(String s){return s.replace('0','۰').replace('1','۱').replace('2','۲').replace('3','۳').replace('4','۴').replace('5','۵').replace('6','۶').replace('7','۷').replace('8','۸').replace('9','۹');}
 private void speakTime(){if(speaker!=null)speaker.speakCurrentTime();}
-private void applyPrefs(){float size=prefs.getFloat("fontSize",56);clock.setTextSize(size);date.setTextSize(Math.max(18,size*.42f));
+private void applyPrefs(){float size=Math.max(72f,prefs.getFloat("fontSize",72));clock.setTextSize(size);date.setTextSize(Math.max(30f,size*.48f));
 String font=prefs.getString("fontChoice","yekan");
-try { Typeface tf; if("vazir".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/Vazir.ttf"); else if("yekan".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/YEKAN.TTF"); else tf=Typeface.create("serif",Typeface.NORMAL); clock.setTypeface(tf); date.setTypeface(tf); } catch(Exception ignored){}int color=prefs.getInt("color",0xffd89b2b);clock.setTextColor(color);getWindow().setStatusBarColor(0xff080e17);int bgId = R.drawable.bg_home;
+try { Typeface tf; if("vazir".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/Vazir.ttf"); else if("yekan".equals(font)) tf=Typeface.createFromAsset(getAssets(),"fonts/YEKAN.TTF"); else tf=Typeface.create("serif",Typeface.NORMAL); clock.setTypeface(tf); date.setTypeface(tf); } catch(Exception ignored){}int color=prefs.getInt("color",0xffd89b2b);clock.setTextColor(color);getWindow().setStatusBarColor(0xff080e17);int bgId = R.drawable.bg_home_landscape;
 String bg = prefs.getString("homeBackground","default");
-if("warm".equals(bg)) bgId = R.drawable.bg_home_warm; else if("plain".equals(bg)) bgId = R.drawable.bg_home_plain;
+if("warm".equals(bg)) bgId = R.drawable.bg_home_warm; else if("plain".equals(bg)) bgId = R.drawable.bg_home_plain; else if("landscape".equals(bg)) bgId = R.drawable.bg_home_landscape;
 findViewById(R.id.root).setBackgroundResource(bgId);}
 private void exitNow(){if(speaker!=null)speaker.stop();finishAndRemoveTask();}
 
@@ -31,18 +31,18 @@ public static void updatePersistentNotification(Context ctx){
  NotificationManager nm=(NotificationManager)ctx.getSystemService(Context.NOTIFICATION_SERVICE);
  final String ch="clock_persistent"; if(Build.VERSION.SDK_INT>=26)nm.createNotificationChannel(new NotificationChannel(ch,"ساعت دائمی",NotificationManager.IMPORTANCE_LOW));
  if(!p.getBoolean("persistentNotification",false)){nm.cancel(1701);return;}
- String mode=p.getString("dateMode","jalali"); Calendar now=Calendar.getInstance(); String time=new SimpleDateFormat("HH:mm",Locale.US).format(now.getTime());
+ String mode=p.getString("dateMode","jalali"); Calendar now=Calendar.getInstance();
  String date;
  if("gregorian".equals(mode)) date=new SimpleDateFormat("yyyy/MM/dd",Locale.US).format(now.getTime()); else {int[] j=jalali(now.get(Calendar.YEAR),now.get(Calendar.MONTH)+1,now.get(Calendar.DAY_OF_MONTH));date=String.format(Locale.US,"%04d/%02d/%02d",j[0],j[1],j[2]);}
- String notificationText=toPersianStatic(time)+" • "+toPersianStatic(date);
+ String notificationText=toPersianStatic(date);
  android.widget.RemoteViews rv=new android.widget.RemoteViews(ctx.getPackageName(),R.layout.notification_large);
- rv.setTextViewText(R.id.notificationTitle,"تايمگو");
+ rv.setTextViewText(R.id.notificationTitle,"تاریخ امروز");
  rv.setTextViewText(R.id.notificationText,notificationText);
  Notification n;
  if(Build.VERSION.SDK_INT>=26){
-  n=new Notification.Builder(ctx,ch).setSmallIcon(R.drawable.ic_status_clock).setCustomContentView(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx,ch).setSmallIcon(R.drawable.ic_status_clock).setCustomContentView(rv).setContentTitle("تاریخ امروز").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }else{
-  n=new Notification.Builder(ctx).setSmallIcon(R.drawable.ic_status_clock).setContent(rv).setContentTitle("تايمگو").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
+  n=new Notification.Builder(ctx).setSmallIcon(R.drawable.ic_status_clock).setContent(rv).setContentTitle("تاریخ امروز").setContentText(notificationText).setOngoing(true).setOnlyAlertOnce(true).build();
  }
  nm.notify(1701,n);
 }

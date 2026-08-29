@@ -17,8 +17,8 @@ import android.os.IBinder;
 public class ShakeService extends Service implements SensorEventListener {
     private static final String CHANNEL = "shake_clock";
     private static final int NOTIFICATION_ID = 1801;
-    private static final float SHAKE_G = 2.35f;
-    private static final long SHAKE_COOLDOWN_MS = 1800L;
+    private static final float DEFAULT_SHAKE_G = 2.60f;
+    private static final long SHAKE_COOLDOWN_MS = 5000L;
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private AudioTimeSpeaker speaker;
@@ -48,7 +48,8 @@ public class ShakeService extends Service implements SensorEventListener {
         if(!getSharedPreferences("settings",MODE_PRIVATE).getBoolean("shakeToSpeak",false))return;
         float x=e.values[0]/SensorManager.GRAVITY_EARTH,y=e.values[1]/SensorManager.GRAVITY_EARTH,z=e.values[2]/SensorManager.GRAVITY_EARTH;
         float g=(float)Math.sqrt(x*x+y*y+z*z); long now=System.currentTimeMillis();
-        if(g>=SHAKE_G && now-lastShakeMs>=SHAKE_COOLDOWN_MS){lastShakeMs=now;if(speaker!=null)speaker.speakCurrentTime();}
+        float threshold = 1.60f + (Math.max(0, Math.min(100, getSharedPreferences("settings",MODE_PRIVATE).getInt("shakeSensitivity",60))) / 100f) * 1.80f;
+        if(g>=threshold && now-lastShakeMs>=SHAKE_COOLDOWN_MS){lastShakeMs=now;if(speaker!=null)speaker.speakCurrentTime();}
     }
     @Override public void onAccuracyChanged(Sensor sensor,int accuracy){}
     private void createChannel(){if(Build.VERSION.SDK_INT>=26){NotificationChannel ch=new NotificationChannel(CHANNEL,"اعلام با تکان",NotificationManager.IMPORTANCE_LOW);NotificationManager nm=getSystemService(NotificationManager.class);if(nm!=null)nm.createNotificationChannel(ch);}}
