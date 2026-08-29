@@ -1,1 +1,91 @@
 
+name: Timegoo Android APK
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect Android project root
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f settings.gradle || -f settings.gradle.kts ]]; then
+            PROJECT_DIR="$PWD"
+          else
+            PROJECT_DIR=""
+            while IFS= read -r -d '' f; do
+              d="$(dirname "$f")"
+              if [[ -f "$d/app/build.gradle" || -f "$d/app/build.gradle.kts" ]]; then
+                PROJECT_DIR="$(cd "$d" && pwd)"
+                break
+              fi
+            done < <(find . -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print0)
+          fi
+          if [[ -z "$PROJECT_DIR" ]]; then
+            echo "ERROR: Android project root not found." >&2
+            exit 1
+          fi
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Android project root: $PROJECT_DIR"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Verify project
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$PROJECT_DIR"
+          test -f settings.gradle || test -f settings.gradle.kts
+          test -f build.gradle || test -f build.gradle.kts
+          test -f app/build.gradle || test -f app/build.gradle.kts
+          test -f app/src/main/AndroidManifest.xml
+          echo "Project root: $(pwd)"
+
+      - name: Build debug APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$PROJECT_DIR"
+          gradle --no-daemon --stacktrace clean assembleDebug
+
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: sayclock-apks
+          path: |
+            ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
