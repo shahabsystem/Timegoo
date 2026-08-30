@@ -22,6 +22,7 @@ public class SettingsActivity extends Activity {
     private static final int REMINDERS = 5;
     private static final int PICK_REMINDER_AUDIO_BASE = 7100;
     private static final int PICK_CUSTOM_DING = 7201;
+    private static final int PICK_HOME_BACKGROUND = 7301;
     private AudioTimeSpeaker speakerForTest;
 
     @Override public void onCreate(Bundle b) {
@@ -323,6 +324,14 @@ public class SettingsActivity extends Activity {
             Toast.makeText(this, "Ding سفارشی اضافه و فعال شد", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (requestCode == PICK_HOME_BACKGROUND && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri u = data.getData();
+            try { getContentResolver().takePersistableUriPermission(u, Intent.FLAG_GRANT_READ_URI_PERMISSION); } catch (Exception ignored) {}
+            prefs.edit().putString("homeCustomBackgroundUri", u.toString()).putString("homeBackground", "custom").apply();
+            updateCustomBackgroundStatus();
+            Toast.makeText(this, "پس‌زمینه سفارشی انتخاب و فعال شد ✓", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (requestCode > PICK_REMINDER_AUDIO_BASE && requestCode <= PICK_REMINDER_AUDIO_BASE + REMINDERS
                 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             int slot = requestCode - PICK_REMINDER_AUDIO_BASE;
@@ -434,12 +443,37 @@ public class SettingsActivity extends Activity {
         });
         RadioGroup backs = findViewById(R.id.backgroundChoices);
         String bg = prefs.getString("homeBackground", "default");
-        backs.check("warm".equals(bg) ? R.id.bgWarm : "plain".equals(bg) ? R.id.bgPlain : "landscape".equals(bg) ? R.id.bgLandscape : R.id.bgDefault);
+        if ("custom".equals(bg) && !prefs.getString("homeCustomBackgroundUri", "").isEmpty()) {
+            backs.clearCheck();
+        } else {
+            backs.check("warm".equals(bg) ? R.id.bgWarm : "plain".equals(bg) ? R.id.bgPlain : "landscape".equals(bg) ? R.id.bgLandscape : R.id.bgDefault);
+        }
         backs.setOnCheckedChangeListener((g,id) -> {
             String v = id == R.id.bgWarm ? "warm" : id == R.id.bgPlain ? "plain" : id == R.id.bgLandscape ? "landscape" : "default";
-            prefs.edit().putString("homeBackground", v).apply();
+            prefs.edit().putString("homeBackground", v).remove("homeCustomBackgroundUri").apply();
+            updateCustomBackgroundStatus();
         });
+
+        Button pickBackground = findViewById(R.id.pickHomeBackground);
+        if (pickBackground != null) pickBackground.setOnClickListener(v -> pickHomeBackgroundFile());
+        updateCustomBackgroundStatus();
         applySelectedFont(root, savedFont);
+    }
+
+
+    private void pickHomeBackgroundFile() {
+        Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("image/*");
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+        startActivityForResult(i, PICK_HOME_BACKGROUND);
+    }
+
+    private void updateCustomBackgroundStatus() {
+        TextView status = findViewById(R.id.customBackgroundStatus);
+        if (status == null) return;
+        String uri = prefs.getString("homeCustomBackgroundUri", "");
+        status.setText(uri.isEmpty() ? "پس‌زمینه سفارشی: انتخاب نشده" : "پس‌زمینه سفارشی: فعال ✓");
     }
 
     private Typeface selectedTypeface(String f) {

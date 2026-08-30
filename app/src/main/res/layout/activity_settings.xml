@@ -82,6 +82,8 @@
 <RadioButton android:id="@+id/bgPlain" android:text="ساده" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 <RadioButton android:id="@+id/bgLandscape" android:text="منظره" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 </RadioGroup>
+<Button android:id="@+id/pickHomeBackground" android:text="🖼 انتخاب / تغییر پس‌زمینه از حافظه گوشی" android:textAllCaps="false" android:background="@drawable/bg_outline_button" android:layout_marginTop="8dp" android:layout_width="match_parent" android:layout_height="50dp"/>
+<TextView android:id="@+id/customBackgroundStatus" android:text="پس‌زمینه سفارشی: انتخاب نشده" android:textColor="@color/muted" android:textSize="13sp" android:gravity="center" android:layout_marginTop="5dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <TextView android:text="رنگ تأکیدی" android:textColor="@color/text" android:textSize="16sp" android:layout_marginTop="12dp" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 <RadioGroup android:id="@+id/colors" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
 <RadioButton android:id="@+id/blue" android:text="آبی" android:textColor="@color/text" android:layout_width="wrap_content" android:layout_height="wrap_content"/>

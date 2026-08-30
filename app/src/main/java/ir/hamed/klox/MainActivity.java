@@ -88,6 +88,13 @@ public class MainActivity extends Activity {
 
         String bg = prefs.getString("homeBackground", "landscape");
         ImageView image = findViewById(R.id.homeBackground);
+        String customUri = prefs.getString("homeCustomBackgroundUri", "");
+        if ("custom".equals(bg) && !customUri.isEmpty()) {
+            try {
+                image.setImageURI(android.net.Uri.parse(customUri));
+                if (image.getDrawable() != null) return;
+            } catch (Exception ignored) {}
+        }
         if ("plain".equals(bg)) image.setImageResource(R.drawable.bg_home_plain);
         else if ("warm".equals(bg)) image.setImageResource(R.drawable.bg_home_warm);
         else image.setImageResource(R.drawable.bg_home_landscape);
