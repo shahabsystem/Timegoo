@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>تایمگو | اعلام و مدیریت ساعت با صدای فارسی</title>
+
+    <meta name="description"
+          content="تایمگو؛ برنامه هوشمند اعلام ساعت و یادآوری با صدای فارسی، تکان دادن گوشی، Ding و امکانات شخصی‌سازی.">
+
+    <meta name="theme-color" content="#0b1220">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: "Vazirmatn", Tahoma, sans-serif;
+            background: #050a12;
+            color: #f5f7fb;
+            line-height: 1.9;
+            overflow-x: hidden;
+        }
+
+        /* ---------- Background ---------- */
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(230,165,65,.20), transparent 30%),
+                radial-gradient(circle at 85% 25%, rgba(35,120,180,.18), transparent 30%),
+                linear-gradient(145deg, #050912, #0b1624 50%, #05080e);
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            opacity: .18;
+            background-image:
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 45px 45px;
+            pointer-events: none;
+        }
+
+        .container {
+            width: min(1150px, 92%);
+            margin: auto;
+        }
+
+        /* ---------- Header ---------- */
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(18px);
+            background: rgba(4, 9, 16, .72);
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        nav {
+            min-height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.45rem;
+            font-weight: 800;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(145deg, #e8ad55, #9a6124);
+            box-shadow: 0 8px 25px rgba(221,157,60,.25);
+            font-size: 1.35rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 24px;
+        }
+
+        nav a {
+            color: #c9d0db;
+            text-decoration: none;
+            font-size: .92rem;
+            transition: .25s;
+        }
+
+        nav a:hover {
+            color: #f1b85c;
+        }
+
+        .nav-button {
+            padding: 9px 18px;
+            border-radius: 12px;
+            background: rgba(238,176,80,.12);
+            border: 1px solid rgba(238,176,80,.35);
+            color: #f2b85c !important;
+        }
+
+        /* ---------- Hero ---------- */
+
+        .hero {
+            min-height: 720px;
+            display: grid;
+            place-items: center;
+            padding: 90px 0 70px;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 850px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 15px;
+            border: 1px solid rgba(239,181,91,.35);
+            border-radius: 100px;
+            background: rgba(239,181,91,.08);
+            color: #efb65b;
+            font-size: .85rem;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: clamp(3rem, 8vw, 6.8rem);
+            line-height: 1;
+            font-weight: 900;
+            letter-spacing: -4px;
+            background: linear-gradient(
+                120deg,
+                #fff,
+                #efb459,
+                #ffe1a0
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 25px;
+        }
+
+        .hero h2 {
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            color: #dce2ea;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: auto;
+            color: #98a4b5;
+            font-size: 1.05rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 35px;
+        }
+
+        .button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            min-width: 180px;
+            padding: 14px 25px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: .3s;
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, #f2bc64, #bd7928);
+            color: #10151d;
+            box-shadow: 0 12px 35px rgba(221,157,60,.22);
+        }
+
+        .button-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 18px 40px rgba(221,157,60,.32);
+        }
+
+        .button-secondary {
+            border: 1px solid rgba(255,255,255,.14);
+            background: rgba(255,255,255,.05);
+            color: white;
+        }
+
+        .button-secondary:hover {
+            background: rgba(255,255,255,.09);
+            transform: translateY(-3px);
+        }
+
+        /* ---------- Clock ---------- */
+
+        .clock-card {
+            margin: 70px auto 0;
+            max-width: 650px;
+            padding: 35px 25px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,.14);
+            background: linear-gradient(
+                145deg,
+                rgba(22,37,57,.80),
+                rgba(8,15,25,.75)
+            );
+            box-shadow:
+                0 30px 80px rgba(0,0,0,.35),
+                inset 0 1px 0 rgba(255,255,255,.08);
+            backdrop-filter: blur(15px);
+        }
+
+        .clock-label {
+            color: #efb65b;
+            font-size: .9rem;
+        }
+
+        #clock {
+            font-size: clamp(3rem, 9vw, 5.7rem);
+            font-weight: 800;
+            direction: ltr;
+            margin: 5px 0;
+        }
+
+        #date {
+            color: #aab5c4;
+            font-size: 1.1rem;
+        }
+
+        /* ---------- Sections ---------- */
+
+        section {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 55px;
+        }
+
+        .section-title span {
+            color: #efb65b;
+            font-size: .9rem;
+        }
+
+        .section-title h2 {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            margin-top: 8px;
+        }
+
+        .section-title p {
+            color: #8e9aaa;
+            max-width: 650px;
+            margin: 12px auto 0;
+        }
+
+        /* ---------- Feature Cards ---------- */
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .feature {
+            padding: 30px;
+            border-radius: 23px;
+            background: rgba(14,25,39,.72);
+            border: 1px solid rgba(255,255,255,.09);
+            transition: .3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-7px);
+            border-color: rgba(238,177,83,.35);
+            box-shadow: 0 20px 45px rgba(0,0,0,.22);
+        }
+
+        .feature-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 17px;
+            display: grid;
+            place-items: center;
+            background: rgba(238,177,83,.10);
+            border: 1px solid rgba(238,177,83,.18);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .feature h3 {
+            font-size: 1.15rem;
+            margin-bottom: 9px;
+        }
+
+        .feature p {
+            color: #8f9aaa;
+            font-size: .92rem;
+        }
+
+        /* ---------- Highlight ---------- */
+
+        .highlight {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: stretch;
+        }
+
+        .highlight-card {
+            padding: 40px;
+            border-radius: 28px;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(25,44,66,.9),
+                    rgba(8,15,24,.85)
+                );
+            border: 1px solid rgba(255,255,255,.10);
+        }
+
+        .highlight-card.gold {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(105,72,28,.75),
+                    rgba(30,24,15,.85)
+                );
+        }
+
+        .highlight-card h3 {
+            font-size: 1.7rem;
+            margin-bottom: 15px;
+        }
+
+        .highlight-card p {
+            color: #a6b0be;
+        }
+
+        .check-list {
+            list-style: none;
+            margin-top: 22px;
+        }
+
+        .check-list li {
+            margin: 10px 0;
+            color: #cbd3df;
+        }
+
+        .check-list li::before {
+            content: "✓";
+            color: #f0b65b;
+            font-weight: bold;
+            margin-left: 9px;
+        }
+
+        /* ---------- Showcase ---------- */
+
+        .showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .showcase-box {
+            min-height: 350px;
+            border-radius: 28px;
+            padding: 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+            overflow: hidden;
+            position: relative;
+            background:
+                radial-gradient(
+                    circle at 50% 20%,
+                    rgba(238,178,85,.18),
+                    transparent 45%
+                ),
+                linear-gradient(145deg,#132238,#070d15);
+            border: 1px solid rgba(255,255,255,.1);
+        }
+
+        .showcase-box::before {
+            content: "تایمگو";
+            position: absolute;
+            top: 40px;
+            right: 35px;
+            font-size: 4rem;
+            font-weight: 900;
+            color: rgba(255,255,255,.035);
+        }
+
+        .showcase-box h3 {
+            font-size: 1.7rem;
+            position: relative;
+        }
+
+        .showcase-box p {
+            color: #9da8b7;
+            position: relative;
+        }
+
+        /* ---------- CTA ---------- */
+
+        .cta {
+            text-align: center;
+            padding: 75px 25px;
+            border-radius: 35px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(224,164,70,.18),
+                    rgba(20,45,65,.25)
+                );
+            border: 1px solid rgba(238,177,83,.18);
+        }
+
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 3.4rem);
+            margin-bottom: 12px;
+        }
+
+        .cta p {
+            color: #9ba6b5;
+            max-width: 650px;
+            margin: auto;
+        }
+
+        /* ---------- Footer ---------- */
+
+        footer {
+            padding: 70px 0 30px;
+            border-top: 1px solid rgba(255,255,255,.08);
+            background: rgba(2,5,10,.55);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-brand p {
+            color: #8994a3;
+            max-width: 420px;
+            margin-top: 12px;
+        }
+
+        footer h3 {
+            margin-bottom: 15px;
+            color: #f0b75c;
+        }
+
+        footer ul {
+            list-style: none;
+        }
+
+        footer li {
+            margin: 8px 0;
+        }
+
+        footer a {
+            color: #aeb8c5;
+            text-decoration: none;
+            transition: .2s;
+        }
+
+        footer a:hover {
+            color: #f0b75c;
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            color: #657080;
+            font-size: .85rem;
+        }
+
+        /* ---------- Responsive ---------- */
+
+        @media (max-width: 850px) {
+
+            nav ul {
+                display: none;
+            }
+
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .highlight,
+            .showcase {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 580px) {
+
+            .hero {
+                min-height: 650px;
+                padding-top: 60px;
+            }
+
+            h1 {
+                letter-spacing: -2px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .highlight-card {
+                padding: 28px;
+            }
+
+            section {
+                padding: 75px 0;
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<header>
+    <div class="container">
+        <nav>
+
+            <a href="#" class="brand">
+                <span class="brand-icon">◷</span>
+                تایمگو
+            </a>
+
+            <ul>
+                <li><a href="#features">امکانات</a></li>
+                <li><a href="#smart">امکانات هوشمند</a></li>
+                <li><a href="#custom">شخصی‌سازی</a></li>
+                <li><a href="#support">حمایت</a></li>
+            </ul>
+
+            <a class="nav-button" href="https://github.com/shahabsystem/timegoo">
+                GitHub
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<main>
+
+<section class="hero">
+
+    <div class="container">
+
+        <div class="hero-content">
+
+            <div class="badge">
+                ⏱ اعلام و مدیریت ساعت با صدای فارسی
+            </div>
+
+            <h1>تایمگو</h1>
+
+            <h2>
+                ساعت را فقط نبین؛ بشنو!
+            </h2>
+
+            <p>
+                تایمگو یک برنامه فارسی برای اعلام ساعت، یادآوری و مدیریت زمان است
+                که تلاش می‌کند همیشه و در هر شرایطی شما را از زمان مطلع نگه دارد.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a class="button button-primary"
+                   href="https://github.com/shahabsystem/timegoo">
+                    مشاهده پروژه در GitHub
+                </a>
+
+                <a class="button button-secondary"
+                   href="#features">
+                    آشنایی با امکانات
+                </a>
+
+            </div>
+
+
+            <div class="clock-card">
+
+                <div class="clock-label">
+                    ساعت فعلی
+                </div>
+
+                <div id="clock">00:00:00</div>
+
+                <div id="date">
+                    در حال دریافت تاریخ...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section id="features">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>امکانات اصلی</span>
+
+            <h2>
+                تایمگو چه کارهایی انجام می‌دهد؟
+            </h2>
+
+            <p>
+                امکاناتی که برای استفاده روزمره طراحی شده‌اند؛
+                ساده، کاربردی و قابل شخصی‌سازی.
+            </p>
+
+        </div>
+
+
+        <div class="features">
+
+            <div class="feature">
+
+                <div class="feature-icon">🔊</div>
+
+                <h3>
+                    اعلام ساعت با صدای فارسی
+                </h3>
+
+                <p>
+                    ساعت و دقیقه را با صدای فارسی اعلام کنید و بدون نیاز
+                    به نگاه کردن به صفحه از زمان مطلع شوید.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-icon">⏰</div>
+
+                <h3>
+                    ۷ برنامه اعلام ساعت
+                </h3>
+
+                <p>
+                    امکان تنظیم چند برنامه مختلف برای اعلام ساعت،
+                    همراه با انتخاب روزهای هفته.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-icon">🔔</div>
+
+                <h3>
+                    ۵ یادآوری
+                </h3>
+
+                <p>
+                    یادآوری‌های شخصی خود را تنظیم کنید و مشخص کنید
+                    در چه روزهایی اجرا شوند.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-icon">📱</div>
+
+                <h3>
+                    اعلام ساعت با تکان دادن
+                </h3>
+
+                <p>
+                    گوشی را تکان دهید تا تایمگو ساعت را اعلام کند؛
+                    با قابلیت تنظیم حساسیت برای جلوگیری از فعال شدن ناخواسته.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-icon">🔔</div>
+
+                <h3>
+                    حالت فقط Ding
+                </h3>
+
+                <p>
+                    در محیط‌های شلوغ یا موقعیت‌هایی که نمی‌خواهید
+                    ساعت با صدای بلند اعلام شود، فقط یک صدای Ding پخش کنید.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div class="feature-icon">🎵</div>
+
+                <h3>
+                    Ding قابل شخصی‌سازی
+                </h3>
+
+                <p>
+                    از Dingهای پیش‌فرض استفاده کنید یا صدای مورد علاقه
+                    خود را از حافظه گوشی انتخاب کنید.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= SMART FEATURES ================= -->
+
+<section id="smart">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>SMART TIME</span>
+
+            <h2>
+                طراحی شده برای زندگی واقعی
+            </h2>
+
+            <p>
+                تایمگو فقط یک ساعت سخنگو نیست؛
+                برای شرایط مختلف استفاده روزمره طراحی شده است.
+            </p>
+
+        </div>
+
+
+        <div class="highlight">
+
+            <div class="highlight-card gold">
+
+                <h3>
+                    🚗 حتی هنگام حرکت
+                </h3>
+
+                <p>
+                    قابلیت اعلام ساعت با تکان دادن گوشی با امکان
+                    تنظیم حساسیت طراحی شده تا هنگام حرکت‌های معمول
+                    گوشی، فعال شدن ناخواسته کمتر شود.
+                </p>
+
+                <ul class="check-list">
+
+                    <li>تنظیم حساسیت تکان</li>
+                    <li>استفاده در خارج از برنامه</li>
+                    <li>مناسب استفاده روزمره</li>
+                    <li>کنترل کامل از تنظیمات</li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="highlight-card">
+
+                <h3>
+                    🔋 مدیریت مصرف باتری
+                </h3>
+
+                <p>
+                    تایمگو امکان دسترسی سریع به تنظیمات باتری دستگاه
+                    را در اختیار کاربر قرار می‌دهد تا در صورت نیاز
+                    محدودیت‌های باتری را بررسی و مدیریت کند.
+                </p>
+
+                <ul class="check-list">
+
+                    <li>دسترسی سریع به تنظیمات باتری</li>
+                    <li>مناسب سرویس‌های پس‌زمینه</li>
+                    <li>کنترل توسط کاربر</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CUSTOMIZATION ================= -->
+
+<section id="custom">
+
+    <div class="container">
+
+        <div class="section-title">
+
+            <span>PERSONALIZATION</span>
+
+            <h2>
+                تایمگو را برای خودت بساز
+            </h2>
+
+            <p>
+                ظاهر و صدای برنامه را مطابق سلیقه خودتان تنظیم کنید.
+            </p>
+
+        </div>
+
+
+        <div class="showcase">
+
+            <div class="showcase-box">
+
+                <h3>
+                    🎨 ظاهر و پس‌زمینه
+                </h3>
+
+                <p>
+                    امکان شخصی‌سازی ظاهر برنامه و انتخاب پس‌زمینه
+                    برای صفحه اصلی، از جمله استفاده از تصویر دلخواه
+                    از حافظه گوشی.
+                </p>
+
+            </div>
+
+
+            <div class="showcase-box">
+
+                <h3>
+                    ✍️ فونت فارسی
+                </h3>
+
+                <p>
+                    انتخاب فونت مناسب برای نمایش بهتر نوشته‌ها و ساعت،
+                    با پشتیبانی از فونت‌های فارسی مانند وزیر و یکان.
+                </p>
+
+            </div>
+
+
+            <div class="showcase-box">
+
+                <h3>
+                    🔔 صدای مورد علاقه
+                </h3>
+
+                <p>
+                    Dingهای پیش‌فرض را انتخاب کنید یا صدای دلخواه
+                    خودتان را به برنامه اضافه کنید.
+                </p>
+
+            </div>
+
+
+            <div class="showcase-box">
+
+                <h3>
+                    📅 کنترل روزهای هفته
+                </h3>
+
+                <p>
+                    برای اعلام ساعت‌ها و یادآوری‌ها مشخص کنید
+                    برنامه در کدام روزهای هفته فعال باشد.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+
+<section>
+
+    <div class="container">
+
+        <div class="cta">
+
+            <h2>
+                زمان، شنیدنی‌تر از همیشه
+            </h2>
+
+            <p>
+                تایمگو برای کسانی ساخته شده که می‌خواهند
+                بدون نگاه کردن مداوم به صفحه، از زمان باخبر باشند.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a class="button button-primary"
+                   href="https://github.com/shahabsystem/timegoo">
+                    🚀 ورود به پروژه
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer id="support">
+
+    <div class="container">
+
+        <div class="footer-grid">
+
+
+            <div class="footer-brand">
+
+                <a href="#" class="brand">
+                    <span class="brand-icon">◷</span>
+                    تایمگو
+                </a>
+
+                <p>
+                    برنامه اعلام و مدیریت ساعت با صدای فارسی؛
+                    ساخته شده برای استفاده ساده، روزمره و قابل شخصی‌سازی.
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    ارتباط با من
+                </h3>
+
+                <ul>
+
+                    <li>
+                        <a href="mailto:hamedmohammadinikche@gmail.com">
+                            📧 ایمیل
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="https://github.com/shahabsystem"
+                           target="_blank">
+                            💻 پروژه‌های دیگر در GitHub
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="https://github.com/shahabsystem/timegoo"
+                           target="_blank">
+                            ⌨️ مخزن تایمگو
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div>
+
+                <h3>
+                    حمایت از پروژه
+                </h3>
+
+                <ul>
+
+                    <li>
+                        <a href="https://coffeebede.com/shahabsystem"
+                           target="_blank">
+                            ☕ یک قهوه مهمانم کن
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="https://reymit.ir/shahabsystem"
+                           target="_blank">
+                            ❤️ حمایت نقدی
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+
+        <div class="copyright">
+
+            © <span id="year"></span>
+            تایمگو — تمام حقوق محفوظ است.
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+    function updateClock() {
+
+        const now = new Date();
+
+        let hours = String(now.getHours()).padStart(2, "0");
+        let minutes = String(now.getMinutes()).padStart(2, "0");
+        let seconds = String(now.getSeconds()).padStart(2, "0");
+
+        document.getElementById("clock").textContent =
+            `${hours}:${minutes}:${seconds}`;
+
+
+        const formatter = new Intl.DateTimeFormat(
+            "fa-IR-u-ca-persian",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+        document.getElementById("date").textContent =
+            formatter.format(now);
+    }
+
+
+    updateClock();
+
+    setInterval(updateClock, 1000);
+
+
+    document.getElementById("year").textContent =
+        new Date().getFullYear();
+
+
+</script>
+
+</body>
+</html>
