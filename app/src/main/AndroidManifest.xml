@@ -3,6 +3,10 @@
 <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false"/>
 <application android:theme="@style/AppTheme" android:label="@string/app_name" android:icon="@mipmap/ic_launcher_modern" android:allowBackup="true" android:supportsRtl="true">
 <activity android:name=".SettingsActivity"/><activity android:name=".MainActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>
+<receiver android:name=".TimegooWidgetProvider" android:label="تایمگو" android:exported="true">
+<intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+<meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_timegoo_info"/>
+</receiver>
 <receiver android:name=".ScheduleReceiver" android:exported="false"/><receiver android:name=".BootReceiver" android:enabled="true" android:exported="true"><intent-filter><action android:name="android.intent.action.BOOT_COMPLETED"/><action android:name="android.intent.action.MY_PACKAGE_REPLACED"/><action android:name="android.intent.action.TIME_SET"/><action android:name="android.intent.action.TIMEZONE_CHANGED"/></intent-filter></receiver>
 <receiver android:name=".ReminderReceiver" android:exported="false"/>
 <service android:name=".ClockAnnouncementService" android:exported="false" android:foregroundServiceType="mediaPlayback"/>

@@ -170,6 +170,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="62dp" />
 
+            <Button
+                android:id="@+id/bingBackgrounds"
+                android:text="🖼  پیشنهاد پس‌زمینه از تصاویر Bing"
+                android:textColor="#F2F5FA"
+                android:textSize="15sp"
+                android:background="@drawable/bg_outline_button"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="52dp" />
+
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_marginTop="11dp"
