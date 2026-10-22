@@ -398,8 +398,8 @@ public class SettingsActivity extends Activity {
 
     private void buildSpeed() {
         SeekBar v = findViewById(R.id.speed); TextView l = findViewById(R.id.speedLabel);
-        int saved = Math.max(70, Math.min(200, prefs.getInt("announcementSpeed", 100)));
-        v.setMax(130); v.setProgress(saved - 70); l.setText(fmtNumber(saved) + "٪");
+        int saved = Math.max(70, Math.min(130, prefs.getInt("announcementSpeed", 100)));
+        v.setProgress(saved - 70); l.setText(fmtNumber(saved) + "٪");
         v.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar s, int p, boolean f) { int val = p + 70; l.setText(fmtNumber(val) + "٪"); if (f) prefs.edit().putInt("announcementSpeed", val).apply(); }
             public void onStartTrackingTouch(SeekBar s) {}

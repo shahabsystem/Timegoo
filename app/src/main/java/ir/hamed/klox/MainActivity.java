@@ -34,15 +34,6 @@ public class MainActivity extends Activity {
         speaker = new AudioTimeSpeaker(this);
         findViewById(R.id.speak).setOnClickListener(v -> speakTime());
         findViewById(R.id.settings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
-        findViewById(R.id.bingBackgrounds).setOnClickListener(v -> {
-            try {
-                Intent bing = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://www.bing.com/images/search?q=beautiful+wallpapers+landscape+4k"));
-                startActivity(bing);
-                Toast.makeText(this, "تصویر را از Bing ذخیره کنید؛ سپس در تنظیمات، «انتخاب تصویر پس‌زمینه» را بزنید.", Toast.LENGTH_LONG).show();
-            } catch (Exception e) {
-                Toast.makeText(this, "مرورگر برای باز کردن Bing پیدا نشد.", Toast.LENGTH_SHORT).show();
-            }
-        });
         findViewById(R.id.exit).setOnClickListener(v -> exitNow());
         ScheduleManager.scheduleNext(this);
         ReminderManager.schedule(this);
