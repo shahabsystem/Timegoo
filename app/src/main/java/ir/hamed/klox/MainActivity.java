@@ -8,6 +8,16 @@ import android.graphics.Typeface;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -15,6 +25,9 @@ public class MainActivity extends Activity {
     private TextView clock, date, statusText;
     private AudioTimeSpeaker speaker;
     private SharedPreferences prefs;
+    private TextView weatherCity, weatherSummary;
+    private LinearLayout weatherForecast;
+    private final java.util.concurrent.ExecutorService weatherExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable clockTicker = new Runnable() {
         @Override public void run() {
@@ -30,7 +43,14 @@ public class MainActivity extends Activity {
         clock = findViewById(R.id.clock);
         date = findViewById(R.id.date);
         statusText = findViewById(R.id.statusText);
+        weatherCity = findViewById(R.id.weatherCity);
+        weatherSummary = findViewById(R.id.weatherSummary);
+        weatherForecast = findViewById(R.id.weatherForecast);
         applyPrefs();
+        weatherCity.setText(prefs.getString("weatherCityDisplay", "تهران"));
+        findViewById(R.id.weatherRefresh).setOnClickListener(v -> loadWeather());
+        findViewById(R.id.weatherChangeCity).setOnClickListener(v -> showCityDialog());
+        loadWeather();
         speaker = new AudioTimeSpeaker(this);
         findViewById(R.id.speak).setOnClickListener(v -> speakTime());
         findViewById(R.id.settings).setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
@@ -109,6 +129,169 @@ public class MainActivity extends Activity {
         else image.setImageResource(R.drawable.bg_home_landscape);
     }
 
+    private void showCityDialog() {
+        EditText input = new EditText(this);
+        input.setSingleLine(true);
+        input.setText(prefs.getString("weatherCityQuery", "Tehran"));
+        input.setHint("مثلاً: تهران یا شیراز");
+        new AlertDialog.Builder(this)
+                .setTitle("شهر هواشناسی")
+                .setMessage("نام شهر را وارد کنید")
+                .setView(input)
+                .setNegativeButton("انصراف", null)
+                .setPositiveButton("ذخیره و دریافت", (dialog, which) -> {
+                    String city = input.getText().toString().trim();
+                    if (!city.isEmpty()) {
+                        String display = city;
+                        if (city.equalsIgnoreCase("Tehran")) display = "تهران";
+                        prefs.edit().putString("weatherCityQuery", city).putString("weatherCityDisplay", display).apply();
+                        weatherCity.setText(display);
+                        loadWeather();
+                    }
+                }).show();
+    }
+
+    private void loadWeather() {
+        if (weatherSummary == null || weatherForecast == null) return;
+        weatherSummary.setText("در حال دریافت پیش‌بینی هوا...");
+        weatherForecast.removeAllViews();
+        String city = prefs.getString("weatherCityQuery", "Tehran");
+        weatherExecutor.execute(() -> {
+            try {
+                String encoded = URLEncoder.encode(city, "UTF-8");
+                JSONObject geo = fetchJson("https://geocoding-api.open-meteo.com/v1/search?name=" + encoded + "&count=1&language=fa&format=json");
+                JSONArray results = geo.optJSONArray("results");
+                if (results == null || results.length() == 0) throw new Exception("شهر پیدا نشد؛ نام شهر را بررسی کنید.");
+                JSONObject place = results.getJSONObject(0);
+                double lat = place.getDouble("latitude");
+                double lon = place.getDouble("longitude");
+                String resolvedName = place.optString("name", city);
+                String url = "https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=3";
+                JSONObject forecast = fetchJson(url);
+                JSONObject daily = forecast.getJSONObject("daily");
+                JSONArray dates = daily.getJSONArray("time");
+                JSONArray codes = daily.getJSONArray("weather_code");
+                JSONArray highs = daily.getJSONArray("temperature_2m_max");
+                JSONArray lows = daily.getJSONArray("temperature_2m_min");
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    String display = prefs.getString("weatherCityDisplay", resolvedName);
+                    weatherCity.setText(display);
+                    weatherSummary.setText("پیش‌بینی سه روز آینده • " + display + "  |  منبع: Open-Meteo");
+                    weatherForecast.removeAllViews();
+                    for (int i = 0; i < Math.min(3, dates.length()); i++) {
+                        String dateText = dates.optString(i, "");
+                        String dayName = getPersianDayName(dateText, i);
+                        int code = codes.optInt(i, 0);
+                        String icon = weatherIcon(code);
+                        String description = weatherDescription(code);
+                        String high = formatTemp(highs.optDouble(i, Double.NaN));
+                        String low = formatTemp(lows.optDouble(i, Double.NaN));
+                        LinearLayout item = new LinearLayout(this);
+                        item.setOrientation(LinearLayout.VERTICAL);
+                        item.setGravity(Gravity.CENTER);
+                        item.setPadding(4, 10, 4, 10);
+                        GradientDrawable shape = new GradientDrawable();
+                        shape.setColor(0x55202D40);
+                        shape.setCornerRadius(dp(12));
+                        shape.setStroke(dp(1), 0x446D829B);
+                        item.setBackground(shape);
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+                        lp.setMargins(dp(3), 0, dp(3), 0);
+                        weatherForecast.addView(item, lp);
+                        addWeatherText(item, dayName, 12, 0xFFD6DCE6, true);
+                        addWeatherText(item, icon, 27, 0xFFFFFFFF, false);
+                        addWeatherText(item, description, 11, 0xFFD6DCE6, true);
+                        addWeatherText(item, high, 17, 0xFFF4B94F, true);
+                        addWeatherText(item, low, 14, 0xFFB9C5D5, false);
+                    }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    weatherSummary.setText("دریافت هواشناسی ناموفق بود. اینترنت را بررسی کنید یا نام شهر را تغییر دهید.");
+                    weatherForecast.removeAllViews();
+                });
+            }
+        });
+    }
+
+    private JSONObject fetchJson(String address) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) new URL(address).openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(10000);
+        connection.setRequestProperty("User-Agent", "Timegoo-Android");
+        try {
+            int status = connection.getResponseCode();
+            if (status < 200 || status >= 300) throw new Exception("HTTP " + status);
+            StringBuilder body = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) body.append(line);
+            }
+            return new JSONObject(body.toString());
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    private void addWeatherText(LinearLayout parent, String value, int size, int color, boolean bold) {
+        TextView t = new TextView(this);
+        t.setText(value);
+        t.setTextColor(color);
+        t.setTextSize(size);
+        t.setGravity(Gravity.CENTER);
+        if (bold) t.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        t.setPadding(0, dp(2), 0, dp(2));
+        parent.addView(t, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+    }
+
+    private int dp(int value) { return (int) (value * getResources().getDisplayMetrics().density + 0.5f); }
+
+    private String getPersianDayName(String date, int offset) {
+        try {
+            Date parsed = new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(date);
+            Calendar c = Calendar.getInstance();
+            c.setTime(parsed);
+            String[] days = {"یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه", "شنبه"};
+            return offset == 0 ? "امروز" : offset == 1 ? "فردا" : days[c.get(Calendar.DAY_OF_WEEK) - 1];
+        } catch (Exception ignored) { return offset == 0 ? "امروز" : offset == 1 ? "فردا" : "روز سوم"; }
+    }
+
+    private String formatTemp(double temp) {
+        if (Double.isNaN(temp)) return "—";
+        return toPersian(String.valueOf((int) Math.round(temp))) + "°";
+    }
+
+    private String weatherIcon(int code) {
+        if (code == 0) return "☀️";
+        if (code == 1 || code == 2) return "🌤️";
+        if (code == 3) return "☁️";
+        if (code == 45 || code == 48) return "🌫️";
+        if (code >= 51 && code <= 67) return "🌦️";
+        if (code >= 71 && code <= 77) return "❄️";
+        if (code >= 80 && code <= 82) return "🌧️";
+        if (code >= 85 && code <= 86) return "🌨️";
+        if (code >= 95) return "⛈️";
+        return "🌡️";
+    }
+
+    private String weatherDescription(int code) {
+        if (code == 0) return "آفتابی";
+        if (code == 1) return "صاف";
+        if (code == 2) return "نیمه‌ابری";
+        if (code == 3) return "ابری";
+        if (code == 45 || code == 48) return "مه";
+        if (code >= 51 && code <= 57) return "نم‌نم";
+        if (code >= 61 && code <= 67) return "باران";
+        if (code >= 71 && code <= 77) return "برف";
+        if (code >= 80 && code <= 82) return "رگبار";
+        if (code >= 85 && code <= 86) return "برف‌پراکنده";
+        if (code >= 95) return "رعدوبرق";
+        return "متغیر";
+    }
+
     private void exitNow() { if (speaker != null) speaker.stop(); finishAndRemoveTask(); }
 
     private String formattedDate(Date date, String mode) {
@@ -144,5 +327,5 @@ public class MainActivity extends Activity {
         nm.notify(1701,n);
     }
     private static String toPersianStatic(String s){return s.replace('0','۰').replace('1','۱').replace('2','۲').replace('3','۳').replace('4','۴').replace('5','۵').replace('6','۶').replace('7','۷').replace('8','۸').replace('9','۹');}
-    @Override protected void onDestroy(){handler.removeCallbacks(clockTicker);if(speaker!=null)speaker.stop();super.onDestroy();}
+    @Override protected void onDestroy(){handler.removeCallbacks(clockTicker);if(speaker!=null)speaker.stop();weatherExecutor.shutdownNow();super.onDestroy();}
 }
